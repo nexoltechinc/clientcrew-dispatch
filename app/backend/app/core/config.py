@@ -119,7 +119,7 @@ QUICKBOOKS_WEBHOOK_PRODUCTION_VERIFIER_TOKEN = get_env(
     "QUICKBOOKS_WEBHOOK_PRODUCTION_VERIFIER_TOKEN",
     QUICKBOOKS_WEBHOOK_VERIFIER_TOKEN,
 )
-ADMIN_EMAIL = get_env("ADMIN_EMAIL", "admin@sm2dispatch.com").strip().lower()
+ADMIN_EMAIL = get_env("ADMIN_EMAIL", "nexoltechsolutionsinc@gmail.com").strip().lower()
 ADMIN_RECOVERY_EMAIL = get_env("ADMIN_RECOVERY_EMAIL", ADMIN_EMAIL).strip().lower()
 ADMIN_DEFAULT_PASSWORD = get_env("ADMIN_DEFAULT_PASSWORD", "admin123")
 

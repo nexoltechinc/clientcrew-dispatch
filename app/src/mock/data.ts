@@ -18,7 +18,7 @@ import type {
 // Current User
 export const currentUser: User = {
   id: 'user-1',
-  email: 'admin@sm2dispatch.com',
+  email: 'nexoltechsolutionsinc@gmail.com',
   name: 'Alex Morgan',
   role: 'admin',
   avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Alex&top=shortHairShortFlat&hairColor=4a312c&facialHair=none&clothing=blazerSweater&clotheColor=3c4f5c&eyeType=default&eyebrowType=default&skinColor=f5d0c5',

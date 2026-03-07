@@ -124,7 +124,7 @@ const getDefaultNewRule = (): Partial<PriorityRule> => ({
 });
 
 const ADMIN_REFRESH_EVENT = 'sm-dispatch:admin-refresh';
-const DEFAULT_ADMIN_EMAIL = 'admin@sm2dispatch.com';
+const DEFAULT_ADMIN_EMAIL = 'nexoltechsolutionsinc@gmail.com';
 
 const getDefaultAdminCredentialValues = () => ({
     adminEmail: DEFAULT_ADMIN_EMAIL,

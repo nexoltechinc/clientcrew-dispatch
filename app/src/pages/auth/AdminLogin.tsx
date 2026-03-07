@@ -29,14 +29,14 @@ export default function AdminLoginPage() {
   const { login } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
-  const [email, setEmail] = useState('admin@sm2dispatch.com');
+  const [email, setEmail] = useState('nexoltechsolutionsinc@gmail.com');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [isForgotPasswordOpen, setIsForgotPasswordOpen] = useState(false);
   const [forgotStep, setForgotStep] = useState<'request' | 'verify' | 'reset'>('request');
-  const [forgotEmail, setForgotEmail] = useState('admin@sm2dispatch.com');
+  const [forgotEmail, setForgotEmail] = useState('nexoltechsolutionsinc@gmail.com');
   const [otp, setOtp] = useState('');
   const [resetToken, setResetToken] = useState('');
   const [newPassword, setNewPassword] = useState('');
@@ -49,7 +49,7 @@ export default function AdminLoginPage() {
 
   const resetForgotState = () => {
     setForgotStep('request');
-    setForgotEmail(email || 'admin@sm2dispatch.com');
+    setForgotEmail(email || 'nexoltechsolutionsinc@gmail.com');
     setOtp('');
     setResetToken('');
     setNewPassword('');
