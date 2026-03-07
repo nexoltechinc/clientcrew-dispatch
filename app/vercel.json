@@ -1,5 +1,6 @@
 {
   "rewrites": [
+    { "source": "/api/:path*", "destination": "https://clientcrew-dispatch-api.onrender.com/:path*" },
     { "source": "/(.*)", "destination": "/index.html" }
   ]
 }
