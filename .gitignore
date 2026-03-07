@@ -1,0 +1,38 @@
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Logs
+*.log
+backend-live*.log
+frontend-live*.log
+
+# Environment files
+.env
+.env.*
+!.env.example
+app/backend/.env
+app/.env
+
+# Node / frontend build
+app/node_modules/
+app/dist/
+app/.vite/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.venv/
+venv/
+app/backend/dispatch_system.db
+
+# Local scratch files
+foo-test.txt
+test-start-process.txt
+
+# Exclude bundled postgres source snapshot
+postgres-source/

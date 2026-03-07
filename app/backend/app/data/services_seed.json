@@ -1,0 +1,382 @@
+[
+  {
+    "code": "PPF-ALA-AILES-COMP-2",
+    "name": "Full Fender Protection (2 panels)",
+    "category": "PPF",
+    "description": "Installation of protective film on both front fenders to prevent rock chips and scratches",
+    "default_price": 400.0,
+    "approval_required": false,
+    "status": "active",
+    "notes": null
+  },
+  {
+    "code": "PPF-ALA-CAPOT-12",
+    "name": "Hood Protection Strip 12\"",
+    "category": "PPF",
+    "description": "Protective film applied to first 12 inches of hood",
+    "default_price": 120.0,
+    "approval_required": false,
+    "status": "active",
+    "notes": null
+  },
+  {
+    "code": "PPF-ALA-CAPOT-18",
+    "name": "Hood Protection Strip 18\"",
+    "category": "PPF",
+    "description": "Extended hood protection coverage",
+    "default_price": 170.0,
+    "approval_required": false,
+    "status": "active",
+    "notes": null
+  },
+  {
+    "code": "PPF-ALA-TOIT-4",
+    "name": "Roof Protection Strip 4\"",
+    "category": "PPF",
+    "description": "Small protective strip for roof edge",
+    "default_price": 40.0,
+    "approval_required": false,
+    "status": "active",
+    "notes": null
+  },
+  {
+    "code": "PPF-ALA-TOIT-6",
+    "name": "Roof Protection Strip 6\"",
+    "category": "PPF",
+    "description": "Extended roof protection strip",
+    "default_price": 50.0,
+    "approval_required": false,
+    "status": "active",
+    "notes": null
+  },
+  {
+    "code": "PPF-ALA-TOIT-8",
+    "name": "Roof Protection Strip 8\"",
+    "category": "PPF",
+    "description": "Wider protection for highway driving",
+    "default_price": 75.0,
+    "approval_required": false,
+    "status": "active",
+    "notes": null
+  },
+  {
+    "code": "PPF-ALA-TOIT-12",
+    "name": "Roof Protection Strip 12\"",
+    "category": "PPF",
+    "description": "Maximum roof edge protection",
+    "default_price": 100.0,
+    "approval_required": false,
+    "status": "active",
+    "notes": null
+  },
+  {
+    "code": "PPF-OPT-BANDE-AR",
+    "name": "Rear Bumper Protection Strip",
+    "category": "PPF",
+    "description": "Film protecting rear bumper loading area",
+    "default_price": 50.0,
+    "approval_required": false,
+    "status": "active",
+    "notes": null
+  },
+  {
+    "code": "CER-EXT-1YR",
+    "name": "1 Year Ceramic Coating",
+    "category": "Ceramic Coating",
+    "description": "Basic ceramic coating protection for paint surfaces",
+    "default_price": 250.0,
+    "approval_required": false,
+    "status": "active",
+    "notes": null
+  },
+  {
+    "code": "CER-EXT-3YR",
+    "name": "3 Year Ceramic Coating",
+    "category": "Ceramic Coating",
+    "description": "Mid-level ceramic coating protection",
+    "default_price": 550.0,
+    "approval_required": false,
+    "status": "active",
+    "notes": null
+  },
+  {
+    "code": "CER-EXT-5YR",
+    "name": "Premium Ceramic Coating",
+    "category": "Ceramic Coating",
+    "description": "High-end ceramic protection with strong hydrophobic effect",
+    "default_price": 900.0,
+    "approval_required": false,
+    "status": "active",
+    "notes": null
+  },
+  {
+    "code": "TINT-FRONT-PAIR",
+    "name": "Front Window Tint",
+    "category": "Window Tint",
+    "description": "Tint applied to driver and passenger windows",
+    "default_price": 120.0,
+    "approval_required": false,
+    "status": "active",
+    "notes": null
+  },
+  {
+    "code": "TINT-FULL-CAR",
+    "name": "Full Vehicle Tint",
+    "category": "Window Tint",
+    "description": "Tint applied to all windows",
+    "default_price": 350.0,
+    "approval_required": false,
+    "status": "active",
+    "notes": null
+  },
+  {
+    "code": "TINT-WINDSHIELD",
+    "name": "Windshield UV Protection Tint",
+    "category": "Window Tint",
+    "description": "UV blocking film applied to windshield",
+    "default_price": 150.0,
+    "approval_required": false,
+    "status": "active",
+    "notes": null
+  },
+  {
+    "code": "PC-STAGE1",
+    "name": "Stage 1 Paint Correction",
+    "category": "Paint Correction",
+    "description": "Removes light swirl marks and restores shine",
+    "default_price": 200.0,
+    "approval_required": false,
+    "status": "active",
+    "notes": null
+  },
+  {
+    "code": "PC-STAGE2",
+    "name": "Stage 2 Paint Correction",
+    "category": "Paint Correction",
+    "description": "Removes deeper scratches and oxidation",
+    "default_price": 400.0,
+    "approval_required": false,
+    "status": "active",
+    "notes": null
+  },
+  {
+    "code": "PC-STAGE3",
+    "name": "Stage 3 Paint Correction",
+    "category": "Paint Correction",
+    "description": "Full professional paint restoration",
+    "default_price": 700.0,
+    "approval_required": false,
+    "status": "active",
+    "notes": null
+  },
+  {
+    "code": "CW-BASIC",
+    "name": "Basic Exterior Wash",
+    "category": "Car Wash",
+    "description": "Exterior wash including soap wash and rinse",
+    "default_price": 25.0,
+    "approval_required": false,
+    "status": "active",
+    "notes": null
+  },
+  {
+    "code": "CW-DELUXE",
+    "name": "Deluxe Car Wash",
+    "category": "Car Wash",
+    "description": "Exterior wash, wheel cleaning and hand drying",
+    "default_price": 40.0,
+    "approval_required": false,
+    "status": "active",
+    "notes": null
+  },
+  {
+    "code": "CW-PREMIUM",
+    "name": "Premium Car Wash",
+    "category": "Car Wash",
+    "description": "Exterior wash, wax spray, tire shine",
+    "default_price": 60.0,
+    "approval_required": false,
+    "status": "active",
+    "notes": null
+  },
+  {
+    "code": "CW-UNDERBODY",
+    "name": "Underbody Wash",
+    "category": "Car Wash",
+    "description": "Cleaning undercarriage to remove dirt and salt",
+    "default_price": 30.0,
+    "approval_required": false,
+    "status": "active",
+    "notes": null
+  },
+  {
+    "code": "INT-VAC",
+    "name": "Interior Vacuum Cleaning",
+    "category": "Interior Cleaning",
+    "description": "Vacuum cleaning of seats, carpets and trunk",
+    "default_price": 30.0,
+    "approval_required": false,
+    "status": "active",
+    "notes": null
+  },
+  {
+    "code": "INT-DEEP",
+    "name": "Deep Interior Cleaning",
+    "category": "Interior Cleaning",
+    "description": "Shampoo cleaning for carpets and seats",
+    "default_price": 90.0,
+    "approval_required": false,
+    "status": "active",
+    "notes": null
+  },
+  {
+    "code": "INT-LEATHER",
+    "name": "Leather Seat Conditioning",
+    "category": "Interior Cleaning",
+    "description": "Cleaning and conditioning leather seats",
+    "default_price": 80.0,
+    "approval_required": false,
+    "status": "active",
+    "notes": null
+  },
+  {
+    "code": "DET-INT-BASIC",
+    "name": "Interior Detailing",
+    "category": "Detailing",
+    "description": "Interior cleaning and sanitization",
+    "default_price": 120.0,
+    "approval_required": false,
+    "status": "active",
+    "notes": null
+  },
+  {
+    "code": "DET-EXT-BASIC",
+    "name": "Exterior Detailing",
+    "category": "Detailing",
+    "description": "Hand wash, wax application and paint shine restoration",
+    "default_price": 100.0,
+    "approval_required": false,
+    "status": "active",
+    "notes": null
+  },
+  {
+    "code": "DET-FULL",
+    "name": "Full Vehicle Detailing",
+    "category": "Detailing",
+    "description": "Complete interior and exterior detailing",
+    "default_price": 220.0,
+    "approval_required": false,
+    "status": "active",
+    "notes": null
+  },
+  {
+    "code": "ENG-CLEAN",
+    "name": "Engine Bay Cleaning",
+    "category": "Engine Bay",
+    "description": "Degreasing and cleaning of engine compartment",
+    "default_price": 70.0,
+    "approval_required": false,
+    "status": "active",
+    "notes": null
+  },
+  {
+    "code": "ENG-DETAIL",
+    "name": "Engine Bay Detailing",
+    "category": "Engine Bay",
+    "description": "Full engine bay cleaning and protective dressing",
+    "default_price": 120.0,
+    "approval_required": false,
+    "status": "active",
+    "notes": null
+  },
+  {
+    "code": "HL-RESTORE",
+    "name": "Headlight Restoration",
+    "category": "Headlight",
+    "description": "Remove oxidation and restore headlight clarity",
+    "default_price": 85.0,
+    "approval_required": false,
+    "status": "active",
+    "notes": null
+  },
+  {
+    "code": "RS-BATTERY",
+    "name": "Battery Replacement",
+    "category": "Roadside",
+    "description": "On-site battery replacement service",
+    "default_price": 120.0,
+    "approval_required": false,
+    "status": "active",
+    "notes": null
+  },
+  {
+    "code": "RS-JUMPSTART",
+    "name": "Battery Jump Start",
+    "category": "Roadside",
+    "description": "Jump start service for dead battery",
+    "default_price": 60.0,
+    "approval_required": false,
+    "status": "active",
+    "notes": null
+  },
+  {
+    "code": "RS-TIRE",
+    "name": "Flat Tire Replacement",
+    "category": "Roadside",
+    "description": "Replace flat tire or install spare",
+    "default_price": 90.0,
+    "approval_required": false,
+    "status": "active",
+    "notes": null
+  },
+  {
+    "code": "RS-FUEL",
+    "name": "Emergency Fuel Delivery",
+    "category": "Roadside",
+    "description": "Fuel delivery for stranded vehicles",
+    "default_price": 70.0,
+    "approval_required": false,
+    "status": "active",
+    "notes": null
+  },
+  {
+    "code": "QS-OIL",
+    "name": "Oil Change Service",
+    "category": "Quick Service",
+    "description": "Engine oil and filter replacement",
+    "default_price": 95.0,
+    "approval_required": false,
+    "status": "active",
+    "notes": null
+  },
+  {
+    "code": "QS-BRAKE",
+    "name": "Brake Pad Replacement",
+    "category": "Quick Service",
+    "description": "Replace worn brake pads",
+    "default_price": 220.0,
+    "approval_required": false,
+    "status": "active",
+    "notes": null
+  },
+  {
+    "code": "QS-AIRFILTER",
+    "name": "Air Filter Replacement",
+    "category": "Quick Service",
+    "description": "Replace engine air filter",
+    "default_price": 45.0,
+    "approval_required": false,
+    "status": "active",
+    "notes": null
+  },
+  {
+    "code": "QS-WIPER",
+    "name": "Wiper Blade Replacement",
+    "category": "Quick Service",
+    "description": "Install new windshield wiper blades",
+    "default_price": 35.0,
+    "approval_required": false,
+    "status": "active",
+    "notes": null
+  }
+]

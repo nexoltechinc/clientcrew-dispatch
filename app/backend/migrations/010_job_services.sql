@@ -1,0 +1,2 @@
+-- Managed by scripts/migrate.py via SQLAlchemy metadata.
+-- Version marker for normalized job_services support.
