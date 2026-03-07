@@ -1082,67 +1082,67 @@ export default function CalendarPage() {
         </Card>
 
         <div className="space-y-4">
-          <Card className="border-slate-200 p-4 shadow-sm">
+          <Card className="border-slate-200 bg-white/95 p-4 shadow-sm dark:border-slate-600 dark:bg-slate-900/92">
             <div className="mb-3 flex items-center gap-2">
               <Clock className="h-4 w-4 text-indigo-600" />
-              <h3 className="text-sm font-semibold text-slate-900">Today's Schedule</h3>
+              <h3 className="text-sm font-semibold text-slate-900 dark:text-slate-100">Today's Schedule</h3>
             </div>
             <div className="space-y-2">
               {todaySchedule.length === 0 ? (
-                <p className="text-sm text-slate-500">No events scheduled for today.</p>
+                <p className="text-sm text-slate-500 dark:text-slate-200">No events scheduled for today.</p>
               ) : todaySchedule.map((entry) => (
-                <div key={`${entry.id}-today`} className="rounded-lg border border-slate-200 bg-slate-50 p-2.5">
-                  <p className="text-xs font-medium text-slate-500">{formatClock(entry.start)}</p>
-                  <p className="text-sm font-semibold text-slate-900">{entry.title}</p>
+                <div key={`${entry.id}-today`} className="rounded-lg border border-slate-200 bg-slate-50 p-2.5 dark:border-slate-600 dark:bg-slate-800/70">
+                  <p className="text-xs font-medium text-slate-500 dark:text-slate-300">{formatClock(entry.start)}</p>
+                  <p className="text-sm font-semibold text-slate-900 dark:text-slate-100">{entry.title}</p>
                   {entry.technicianName ? (
-                    <p className="text-xs text-slate-600">{entry.technicianName}</p>
+                    <p className="text-xs text-slate-600 dark:text-slate-200">{entry.technicianName}</p>
                   ) : null}
                 </div>
               ))}
             </div>
           </Card>
 
-          <Card className="border-slate-200 p-4 shadow-sm">
+          <Card className="border-slate-200 bg-white/95 p-4 shadow-sm dark:border-slate-600 dark:bg-slate-900/92">
             <div className="mb-3 flex items-center gap-2">
               <CalendarDays className="h-4 w-4 text-indigo-600" />
-              <h3 className="text-sm font-semibold text-slate-900">Upcoming Appointments</h3>
+              <h3 className="text-sm font-semibold text-slate-900 dark:text-slate-100">Upcoming Appointments</h3>
             </div>
             <div className="space-y-2">
               {upcomingAppointments.length === 0 ? (
-                <p className="text-sm text-slate-500">No upcoming appointments.</p>
+                <p className="text-sm text-slate-500 dark:text-slate-200">No upcoming appointments.</p>
               ) : upcomingAppointments.map((entry) => (
-                <div key={`${entry.id}-upcoming`} className="rounded-lg border border-slate-200 p-2.5">
-                  <p className="text-sm font-semibold text-slate-900">{entry.title}</p>
-                  <p className="text-xs text-slate-600">{formatDateTime(entry.start)}</p>
+                <div key={`${entry.id}-upcoming`} className="rounded-lg border border-slate-200 p-2.5 dark:border-slate-600 dark:bg-slate-800/60">
+                  <p className="text-sm font-semibold text-slate-900 dark:text-slate-100">{entry.title}</p>
+                  <p className="text-xs text-slate-600 dark:text-slate-200">{formatDateTime(entry.start)}</p>
                 </div>
               ))}
             </div>
           </Card>
 
-          <Card className="border-slate-200 p-4 shadow-sm">
+          <Card className="border-slate-200 bg-white/95 p-4 shadow-sm dark:border-slate-600 dark:bg-slate-900/92">
             <div className="mb-3 flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <Users className="h-4 w-4 text-indigo-600" />
-                <h3 className="text-sm font-semibold text-slate-900">Technician Availability</h3>
+                <h3 className="text-sm font-semibold text-slate-900 dark:text-slate-100">Technician Availability</h3>
               </div>
               <div className="flex gap-1.5">
                 <Badge className="border-emerald-200 bg-emerald-50 text-emerald-700">{availabilityCounts.available} Live</Badge>
                 <Badge className="border-amber-200 bg-amber-50 text-amber-700">{availabilityCounts.busy} Busy</Badge>
-                <Badge className="border-slate-200 bg-slate-100 text-slate-700">{availabilityCounts.offDuty} Off</Badge>
+                <Badge className="border-slate-200 bg-slate-100 text-slate-700 dark:border-slate-500 dark:bg-slate-700 dark:text-slate-100">{availabilityCounts.offDuty} Off</Badge>
               </div>
             </div>
 
             <div className="space-y-2">
               {technicianAvailability.length === 0 ? (
-                <p className="text-sm text-slate-500">No technicians found.</p>
+                <p className="text-sm text-slate-500 dark:text-slate-200">No technicians found.</p>
               ) : technicianAvailability.slice(0, 8).map((entry) => (
-                <div key={entry.id} className="flex items-center justify-between rounded-lg border border-slate-200 px-3 py-2">
-                  <p className="text-sm font-medium text-slate-800">{entry.name}</p>
+                <div key={entry.id} className="flex items-center justify-between rounded-lg border border-slate-200 px-3 py-2 dark:border-slate-600 dark:bg-slate-800/60">
+                  <p className="text-sm font-medium text-slate-800 dark:text-slate-100">{entry.name}</p>
                   <Badge
                     className={cn(
                       entry.status === 'available' && 'border-emerald-200 bg-emerald-50 text-emerald-700',
                       entry.status === 'busy' && 'border-amber-200 bg-amber-50 text-amber-700',
-                      entry.status === 'off_duty' && 'border-slate-200 bg-slate-100 text-slate-700',
+                      entry.status === 'off_duty' && 'border-slate-200 bg-slate-100 text-slate-700 dark:border-slate-500 dark:bg-slate-700 dark:text-slate-100',
                     )}
                   >
                     {entry.status === 'off_duty' ? 'Off-duty' : entry.status}
@@ -1152,46 +1152,46 @@ export default function CalendarPage() {
             </div>
           </Card>
 
-          <Card className="border-slate-200 p-4 shadow-sm">
+          <Card className="border-slate-200 bg-white/95 p-4 shadow-sm dark:border-slate-600 dark:bg-slate-900/92">
             <div className="mb-3 flex items-center gap-2">
               <Truck className="h-4 w-4 text-indigo-600" />
-              <h3 className="text-sm font-semibold text-slate-900">Pending Deliveries</h3>
+              <h3 className="text-sm font-semibold text-slate-900 dark:text-slate-100">Pending Deliveries</h3>
             </div>
             <div className="space-y-2">
               {pendingDeliveries.length === 0 ? (
-                <p className="text-sm text-slate-500">No pending deliveries.</p>
+                <p className="text-sm text-slate-500 dark:text-slate-200">No pending deliveries.</p>
               ) : pendingDeliveries.map((entry) => (
-                <div key={`${entry.id}-delivery`} className="rounded-lg border border-slate-200 p-2.5">
-                  <p className="text-sm font-semibold text-slate-900">{entry.title}</p>
-                  <p className="text-xs text-slate-600">{formatDateTime(entry.start)}</p>
+                <div key={`${entry.id}-delivery`} className="rounded-lg border border-slate-200 p-2.5 dark:border-slate-600 dark:bg-slate-800/60">
+                  <p className="text-sm font-semibold text-slate-900 dark:text-slate-100">{entry.title}</p>
+                  <p className="text-xs text-slate-600 dark:text-slate-200">{formatDateTime(entry.start)}</p>
                 </div>
               ))}
             </div>
           </Card>
 
-          <Card className="border-slate-200 p-4 shadow-sm">
+          <Card className="border-slate-200 bg-white/95 p-4 shadow-sm dark:border-slate-600 dark:bg-slate-900/92">
             <div className="mb-3 flex items-center gap-2">
               <Activity className="h-4 w-4 text-indigo-600" />
-              <h3 className="text-sm font-semibold text-slate-900">Selected Event</h3>
+              <h3 className="text-sm font-semibold text-slate-900 dark:text-slate-100">Selected Event</h3>
             </div>
 
             {!selectedEvent ? (
-              <p className="text-sm text-slate-500">Select a calendar event to inspect details and actions.</p>
+              <p className="text-sm text-slate-500 dark:text-slate-200">Select a calendar event to inspect details and actions.</p>
             ) : (
               <div className="space-y-3">
                 <div>
-                  <p className="text-base font-semibold text-slate-900">{selectedEvent.title}</p>
+                  <p className="text-base font-semibold text-slate-900 dark:text-slate-100">{selectedEvent.title}</p>
                   <div className="mt-1.5 flex flex-wrap items-center gap-2">
                     <Badge className={EVENT_TYPE_META[selectedEvent.eventType].chipClassName}>
                       {EVENT_TYPE_META[selectedEvent.eventType].label}
                     </Badge>
-                    <Badge variant="outline" className="border-slate-200 text-slate-600">
+                    <Badge variant="outline" className="border-slate-200 text-slate-600 dark:border-slate-500 dark:text-slate-200">
                       {selectedEvent.source === 'calendar' ? 'Custom Event' : selectedEvent.source === 'job' ? 'Job Linked' : 'Invoice Linked'}
                     </Badge>
                   </div>
                 </div>
 
-                <div className="space-y-1 text-xs text-slate-600">
+                <div className="space-y-1 text-xs text-slate-600 dark:text-slate-200">
                   <p>{formatDateTime(selectedEvent.start)} - {formatDateTime(selectedEvent.end)}</p>
                   {selectedEvent.customerName ? <p>Customer: {selectedEvent.customerName}</p> : null}
                   {selectedEvent.location ? <p>Location: {selectedEvent.location}</p> : null}
@@ -1208,10 +1208,10 @@ export default function CalendarPage() {
                 ) : null}
 
                 {selectedEvent.source !== 'invoice' ? (
-                  <div className="space-y-2 rounded-lg border border-slate-200 bg-slate-50 p-3">
-                    <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Move Between Technicians</p>
+                  <div className="space-y-2 rounded-lg border border-slate-200 bg-slate-50 p-3 dark:border-slate-600 dark:bg-slate-800/70">
+                    <p className="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-300">Move Between Technicians</p>
                     <Select value={selectedTechnicianId || 'unassigned'} onValueChange={(value) => setSelectedTechnicianId(value === 'unassigned' ? '' : value)}>
-                      <SelectTrigger className="h-9 bg-white">
+                      <SelectTrigger className="h-9 bg-white dark:border-slate-500 dark:bg-slate-900 dark:text-slate-100">
                         <SelectValue placeholder="Select technician" />
                       </SelectTrigger>
                       <SelectContent>
@@ -1229,23 +1229,23 @@ export default function CalendarPage() {
 
                 {selectedEvent.source === 'calendar' ? (
                   <>
-                    <div className="space-y-2 rounded-lg border border-slate-200 bg-slate-50 p-3">
-                      <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Reminder Channels</p>
+                    <div className="space-y-2 rounded-lg border border-slate-200 bg-slate-50 p-3 dark:border-slate-600 dark:bg-slate-800/70">
+                      <p className="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-300">Reminder Channels</p>
                       <div className="flex flex-wrap gap-2">
-                        <Badge variant="outline" className={selectedEvent.reminderEmail ? 'border-emerald-200 bg-emerald-50 text-emerald-700' : 'border-slate-200 text-slate-500'}>
+                        <Badge variant="outline" className={selectedEvent.reminderEmail ? 'border-emerald-200 bg-emerald-50 text-emerald-700' : 'border-slate-200 text-slate-500 dark:border-slate-500 dark:text-slate-200'}>
                           <Mail className="mr-1 h-3 w-3" /> Email
                         </Badge>
-                        <Badge variant="outline" className={selectedEvent.reminderSms ? 'border-emerald-200 bg-emerald-50 text-emerald-700' : 'border-slate-200 text-slate-500'}>
+                        <Badge variant="outline" className={selectedEvent.reminderSms ? 'border-emerald-200 bg-emerald-50 text-emerald-700' : 'border-slate-200 text-slate-500 dark:border-slate-500 dark:text-slate-200'}>
                           <MessageSquare className="mr-1 h-3 w-3" /> SMS
                         </Badge>
-                        <Badge variant="outline" className={selectedEvent.reminderDashboard ? 'border-emerald-200 bg-emerald-50 text-emerald-700' : 'border-slate-200 text-slate-500'}>
+                        <Badge variant="outline" className={selectedEvent.reminderDashboard ? 'border-emerald-200 bg-emerald-50 text-emerald-700' : 'border-slate-200 text-slate-500 dark:border-slate-500 dark:text-slate-200'}>
                           <Bell className="mr-1 h-3 w-3" /> Dashboard
                         </Badge>
                       </div>
                     </div>
 
-                    <div className="space-y-2 rounded-lg border border-slate-200 p-3">
-                      <Label className="text-xs font-semibold uppercase tracking-wide text-slate-500">Add Internal Note</Label>
+                    <div className="space-y-2 rounded-lg border border-slate-200 p-3 dark:border-slate-600 dark:bg-slate-800/50">
+                      <Label className="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-300">Add Internal Note</Label>
                       <Textarea
                         value={noteDraft}
                         onChange={(event) => setNoteDraft(event.target.value)}
@@ -1259,16 +1259,16 @@ export default function CalendarPage() {
                     </div>
 
                     <div className="space-y-2">
-                      <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Activity Log</p>
+                      <p className="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-300">Activity Log</p>
                       {selectedEvent.activityLog.length === 0 ? (
-                        <p className="text-sm text-slate-500">No updates yet.</p>
+                        <p className="text-sm text-slate-500 dark:text-slate-200">No updates yet.</p>
                       ) : (
                         <div className="max-h-48 space-y-2 overflow-auto pr-1">
                           {selectedEvent.activityLog.slice().reverse().map((entry, index) => (
-                            <div key={`${entry.timestamp}-${index}`} className="rounded-lg border border-slate-200 p-2.5">
-                              <p className="text-xs font-medium text-slate-700">{entry.actor_role}</p>
-                              <p className="text-xs text-slate-500">{formatDateTime(new Date(entry.timestamp))}</p>
-                              <p className="mt-1 text-sm text-slate-700">{entry.message}</p>
+                            <div key={`${entry.timestamp}-${index}`} className="rounded-lg border border-slate-200 p-2.5 dark:border-slate-600 dark:bg-slate-800/60">
+                              <p className="text-xs font-medium text-slate-700 dark:text-slate-100">{entry.actor_role}</p>
+                              <p className="text-xs text-slate-500 dark:text-slate-300">{formatDateTime(new Date(entry.timestamp))}</p>
+                              <p className="mt-1 text-sm text-slate-700 dark:text-slate-200">{entry.message}</p>
                             </div>
                           ))}
                         </div>
@@ -1280,12 +1280,12 @@ export default function CalendarPage() {
             )}
           </Card>
 
-          <Card className="border-slate-200 p-4 shadow-sm">
-            <div className="flex items-center gap-2 text-sm font-semibold text-slate-900">
+          <Card className="border-slate-200 bg-white/95 p-4 shadow-sm dark:border-slate-600 dark:bg-slate-900/92">
+            <div className="flex items-center gap-2 text-sm font-semibold text-slate-900 dark:text-slate-100">
               <Database className="h-4 w-4 text-indigo-600" />
               Dispatch Integrations
             </div>
-            <div className="mt-3 space-y-2 text-xs text-slate-600">
+            <div className="mt-3 space-y-2 text-xs text-slate-600 dark:text-slate-200">
               <p>Jobs module sync: {jobRows.length} events linked</p>
               <p>Technicians module sync: {technicianRows.length} profiles loaded</p>
               <p>Invoices module sync: {invoiceRows.length} records checked</p>

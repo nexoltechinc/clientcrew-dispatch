@@ -542,14 +542,8 @@ export default function Dashboard() {
         <div className="relative flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
           <div>
             <h1 className="text-3xl font-bold tracking-tight">Dispatch Operations Dashboard</h1>
-            <p className="mt-2 max-w-2xl text-sm text-indigo-100">
-              Real-time visibility into jobs, technician activity, invoice flow, and operational health.
-            </p>
           </div>
           <div className="flex flex-wrap items-center justify-end gap-3">
-            <Badge className="border-0 bg-white/20 px-3 py-1 text-xs font-semibold text-white backdrop-blur">
-              Enterprise View
-            </Badge>
             <Badge className="border-0 bg-emerald-500/25 px-3 py-1 text-xs font-semibold text-emerald-100 backdrop-blur">
               Live Backend Sync
             </Badge>

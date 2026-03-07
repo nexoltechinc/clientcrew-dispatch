@@ -862,7 +862,7 @@ export default function SettingsPage() {
                                     id="invoice_company_name"
                                     value={invoiceCompany.name}
                                     onChange={(e) => setInvoiceCompany({ ...invoiceCompany, name: e.target.value })}
-                                    placeholder="SM2 Dispatch"
+                                    placeholder="Client-Crew Dispatch"
                                 />
                             </div>
                             <div className="space-y-2">
@@ -872,7 +872,7 @@ export default function SettingsPage() {
                                     type="email"
                                     value={invoiceCompany.email}
                                     onChange={(e) => setInvoiceCompany({ ...invoiceCompany, email: e.target.value })}
-                                    placeholder="billing@sm2dispatch.com"
+                                    placeholder="billing@clientcrew-dispatch.com"
                                 />
                             </div>
                             <div className="space-y-2 sm:col-span-2">
@@ -881,7 +881,7 @@ export default function SettingsPage() {
                                     id="invoice_company_street"
                                     value={invoiceCompany.street_address}
                                     onChange={(e) => setInvoiceCompany({ ...invoiceCompany, street_address: e.target.value })}
-                                    placeholder="123 Dispatch Ave"
+                                    placeholder="123 Service Lane"
                                 />
                             </div>
                             <div className="space-y-2">
@@ -926,7 +926,7 @@ export default function SettingsPage() {
                                     id="invoice_company_website"
                                     value={invoiceCompany.website}
                                     onChange={(e) => setInvoiceCompany({ ...invoiceCompany, website: e.target.value })}
-                                    placeholder="https://www.sm2dispatch.com"
+                                    placeholder="https://clientcrew-dispatch.vercel.app"
                                 />
                             </div>
                         </div>
