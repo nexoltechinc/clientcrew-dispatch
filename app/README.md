@@ -8,6 +8,7 @@ This template provides a minimal setup to get React working in Vite with HMR and
 - Backend API runs on `http://localhost:8000` (`uvicorn app.main:app --reload --port 8000` in `backend/`).
 - Vite proxy forwards `/auth`, `/admin`, and `/technician` to the backend target.
 - Optional frontend env override: set `VITE_BACKEND_URL` in `.env`.
+- For Vercel + Render same-domain setup, use `VITE_BACKEND_URL=/api` and keep `vercel.json` rewrite from `/api/:path*` to your Render backend URL.
 
 Currently, two official plugins are available:
 

@@ -1,6 +1,7 @@
 const ADMIN_TOKEN_STORAGE_KEY = 'sm_dispatch_admin_access_token';
 const TECHNICIAN_TOKEN_STORAGE_KEY = 'sm_dispatch_technician_access_token';
-const API_BASE_URL = (import.meta.env.VITE_BACKEND_URL || 'http://localhost:8000').replace(/\/$/, '');
+const DEFAULT_API_BASE_URL = import.meta.env.DEV ? 'http://localhost:8000' : '/api';
+const API_BASE_URL = (import.meta.env.VITE_BACKEND_URL || DEFAULT_API_BASE_URL).replace(/\/$/, '');
 
 type RequestMethod = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
 
