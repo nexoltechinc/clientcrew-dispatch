@@ -2,13 +2,13 @@ import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import {
   LayoutDashboard,
-  ClipboardList,
+  Briefcase,
   FileCheck,
   Users,
-  Building2,
+  UserCircle2,
   Wrench,
   BarChart3,
-  ScrollText,
+  Receipt,
   Settings,
   Menu,
   X,
@@ -35,12 +35,12 @@ import { TechnicianPreviewModal } from '@/components/modals/TechnicianPreviewMod
 
 const navItems = [
   { path: '/admin', label: 'Dashboard', icon: LayoutDashboard },
-  { path: '/admin/jobs', label: 'Jobs', icon: ClipboardList },
+  { path: '/admin/jobs', label: 'Jobs', icon: Briefcase },
   { path: '/admin/invoice-approvals', label: 'Invoice Approvals', icon: FileCheck },
-  { path: '/admin/invoice-history', label: 'Invoice History', icon: ScrollText },
+  { path: '/admin/invoice-history', label: 'Invoice History', icon: Receipt },
   { path: '/admin/technicians', label: 'Technicians', icon: Users },
   { path: '/admin/technician-accounts', label: 'Tech Accounts', icon: UserCog },
-  { path: '/admin/dealerships', label: 'Customers', icon: Building2 },
+  { path: '/admin/dealerships', label: 'Customers', icon: UserCircle2 },
   { path: '/admin/services', label: 'Services', icon: Wrench },
   { path: '/admin/reports', label: 'Reports', icon: BarChart3 },
   { path: '/admin/settings', label: 'Settings', icon: Settings },
@@ -63,19 +63,19 @@ function Sidebar({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) 
       {/* Sidebar */}
       <aside
         className={cn(
-          'admin-sidebar fixed lg:sticky top-0 left-0 z-50 h-screen w-64 bg-background border-r border-border',
+          'admin-sidebar fixed lg:sticky top-0 left-0 z-50 h-screen w-64 border-r border-slate-200 bg-gradient-to-b from-white to-slate-50',
           'flex flex-col transition-transform duration-300 ease-in-out',
           isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
         )}
       >
         {/* Logo */}
-        <div className="flex items-center gap-3 px-6 py-5 border-b border-border flex-shrink-0">
-          <div className="w-9 h-9 rounded-xl bg-primary flex items-center justify-center shadow-sm">
+        <div className="flex items-center gap-3 border-b border-slate-200 px-6 py-5 flex-shrink-0">
+          <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-[#4F46E5] to-[#8B5CF6] flex items-center justify-center shadow-sm">
             <Shield className="w-5 h-5 text-primary-foreground" />
           </div>
           <div>
-            <h1 className="font-semibold text-foreground leading-tight">SM2 Dispatch</h1>
-            <p className="text-xs text-muted-foreground font-medium">Operational Center</p>
+            <h1 className="font-semibold text-slate-900 leading-tight">Client-Crew Dispatch</h1>
+            <p className="text-xs text-slate-500 font-medium">Operations Center</p>
           </div>
         </div>
 
@@ -91,13 +91,13 @@ function Sidebar({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) 
                 to={item.path}
                 onClick={onClose}
                 className={cn(
-                  'flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 w-full text-left group',
+                  'flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 w-full text-left group border',
                   isActive
-                    ? 'bg-muted text-primary shadow-sm dark:bg-slate-800/75 dark:text-cyan-300 dark:shadow-[inset_0_0_0_1px_rgba(45,212,191,0.18)]'
-                    : 'text-muted-foreground hover:bg-muted hover:text-foreground dark:text-slate-400 dark:hover:bg-slate-800/55 dark:hover:text-slate-100'
+                    ? 'border-indigo-100 bg-indigo-50 text-indigo-700 shadow-sm dark:bg-slate-800/75 dark:text-cyan-300 dark:shadow-[inset_0_0_0_1px_rgba(45,212,191,0.18)]'
+                    : 'border-transparent text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-800/55 dark:hover:text-slate-100'
                 )}
               >
-                <Icon className={cn('w-5 h-5 transition-colors', isActive ? 'text-primary dark:text-cyan-300' : 'text-muted-foreground group-hover:text-foreground dark:text-slate-500 dark:group-hover:text-slate-200')} />
+                <Icon className={cn('w-5 h-5 transition-colors', isActive ? 'text-indigo-600 dark:text-cyan-300' : 'text-slate-500 group-hover:text-slate-900 dark:text-slate-500 dark:group-hover:text-slate-200')} />
                 {item.label}
               </Link>
             );
