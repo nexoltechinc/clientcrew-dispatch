@@ -1,6 +1,7 @@
 from fastapi import APIRouter
 
 from .endpoints import (
+    admin_calendar,
     admin_dealerships,
     admin_email_change_requests,
     admin_jobs,
@@ -21,6 +22,7 @@ router = APIRouter(prefix="/api/v1", tags=["api-v1"])
 # Admin resources
 router.include_router(admin_technicians.router)
 router.include_router(admin_jobs.router)
+router.include_router(admin_calendar.router)
 router.include_router(admin_dealerships.router)
 router.include_router(admin_email_change_requests.router)
 router.include_router(admin_reports.router)

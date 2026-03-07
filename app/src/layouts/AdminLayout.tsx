@@ -18,7 +18,8 @@ import {
   RefreshCw,
   Bell,
   Eye,
-  UserCog
+  UserCog,
+  CalendarDays
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/contexts/AuthContext';
@@ -35,6 +36,7 @@ import { TechnicianPreviewModal } from '@/components/modals/TechnicianPreviewMod
 
 const navItems = [
   { path: '/admin', label: 'Dashboard', icon: LayoutDashboard },
+  { path: '/admin/calendar', label: 'Calendar', icon: CalendarDays },
   { path: '/admin/jobs', label: 'Jobs', icon: Briefcase },
   { path: '/admin/invoice-approvals', label: 'Invoice Approvals', icon: FileCheck },
   { path: '/admin/invoice-history', label: 'Invoice History', icon: Receipt },

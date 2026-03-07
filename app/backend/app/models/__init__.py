@@ -1,5 +1,6 @@
 from .admin_credential_settings import AdminCredentialSettings
 from .audit_log import AuditLog
+from .calendar_event import CalendarEvent
 from .dealership import Dealership
 from .invoice import Invoice, InvoiceLineItem
 from .invoice_approval_draft import InvoiceApprovalDraft

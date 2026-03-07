@@ -7,6 +7,7 @@ from sqlalchemy.exc import OperationalError
 from .api import deps
 from .api import rest_v1
 from .api.endpoints import (
+    admin_calendar,
     admin_jobs,
     admin_dealerships,
     admin_email_change_requests,
@@ -85,6 +86,7 @@ app.add_middleware(
 
 app.include_router(admin_technicians.router)
 app.include_router(admin_jobs.router)
+app.include_router(admin_calendar.router)
 app.include_router(admin_dealerships.router)
 app.include_router(admin_email_change_requests.router)
 app.include_router(admin_reports.router)

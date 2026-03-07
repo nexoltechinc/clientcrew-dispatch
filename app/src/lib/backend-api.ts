@@ -285,6 +285,79 @@ export type BackendPriorityRule = {
   updated_at: string;
 };
 
+export type BackendCalendarEventType =
+  | 'appointment'
+  | 'service_job'
+  | 'delivery'
+  | 'technician_schedule'
+  | 'reminder'
+  | 'urgent';
+
+export type BackendCalendarEventPriority = 'low' | 'normal' | 'high' | 'urgent';
+
+export type BackendCalendarEventActivityEntry = {
+  timestamp: string;
+  actor_role: string;
+  message: string;
+};
+
+export type BackendCalendarEvent = {
+  id: string;
+  title: string;
+  event_type: BackendCalendarEventType;
+  customer_name?: string | null;
+  location?: string | null;
+  assigned_technician_id?: string | null;
+  assigned_technician_name?: string | null;
+  start_at: string;
+  end_at: string;
+  description?: string | null;
+  priority: BackendCalendarEventPriority;
+  attachments: string[];
+  reminder_email: boolean;
+  reminder_sms: boolean;
+  reminder_dashboard: boolean;
+  internal_notes?: string | null;
+  activity_log: BackendCalendarEventActivityEntry[];
+  created_by_role: string;
+  created_at: string;
+  updated_at: string;
+};
+
+export type BackendCalendarEventCreatePayload = {
+  title: string;
+  event_type: BackendCalendarEventType;
+  customer_name?: string | null;
+  location?: string | null;
+  assigned_technician_id?: string | null;
+  start_at: string;
+  end_at: string;
+  description?: string | null;
+  priority?: BackendCalendarEventPriority;
+  attachments?: string[];
+  reminder_email?: boolean;
+  reminder_sms?: boolean;
+  reminder_dashboard?: boolean;
+  internal_notes?: string | null;
+};
+
+export type BackendCalendarEventUpdatePayload = {
+  title?: string;
+  event_type?: BackendCalendarEventType;
+  customer_name?: string | null;
+  location?: string | null;
+  assigned_technician_id?: string | null;
+  start_at?: string;
+  end_at?: string;
+  description?: string | null;
+  priority?: BackendCalendarEventPriority;
+  attachments?: string[];
+  reminder_email?: boolean;
+  reminder_sms?: boolean;
+  reminder_dashboard?: boolean;
+  internal_notes?: string | null;
+};
+
 export type BackendInvoiceLineItem = {
   id: string;
   job_id?: string | null;
@@ -1291,6 +1364,85 @@ export async function rejectAdminEmailChangeRequest(
     method: 'POST',
     token,
     body: { remarks },
+  });
+}
+
+export async function fetchAdminCalendarEvents(
+  token: string,
+  params?: {
+    start_at?: string;
+    end_at?: string;
+    technician_id?: string;
+    event_type?: BackendCalendarEventType;
+  },
+): Promise<BackendCalendarEvent[]> {
+  const search = new URLSearchParams();
+  if (params?.start_at) search.set('start_at', params.start_at);
+  if (params?.end_at) search.set('end_at', params.end_at);
+  if (params?.technician_id) search.set('technician_id', params.technician_id);
+  if (params?.event_type) search.set('event_type', params.event_type);
+  const suffix = search.toString() ? `?${search.toString()}` : '';
+  return requestJson<BackendCalendarEvent[]>(`/admin/calendar/events${suffix}`, { token });
+}
+
+export async function createAdminCalendarEvent(
+  token: string,
+  payload: BackendCalendarEventCreatePayload,
+): Promise<BackendCalendarEvent> {
+  return requestJson<BackendCalendarEvent>('/admin/calendar/events', {
+    method: 'POST',
+    token,
+    body: payload,
+  });
+}
+
+export async function updateAdminCalendarEvent(
+  token: string,
+  eventId: string,
+  payload: BackendCalendarEventUpdatePayload,
+): Promise<BackendCalendarEvent> {
+  return requestJson<BackendCalendarEvent>(`/admin/calendar/events/${eventId}`, {
+    method: 'PATCH',
+    token,
+    body: payload,
+  });
+}
+
+export async function rescheduleAdminCalendarEvent(
+  token: string,
+  eventId: string,
+  payload: {
+    start_at: string;
+    end_at: string;
+    assigned_technician_id?: string | null;
+  },
+): Promise<BackendCalendarEvent> {
+  return requestJson<BackendCalendarEvent>(`/admin/calendar/events/${eventId}/schedule`, {
+    method: 'PATCH',
+    token,
+    body: payload,
+  });
+}
+
+export async function addAdminCalendarEventNote(
+  token: string,
+  eventId: string,
+  note: string,
+): Promise<BackendCalendarEvent> {
+  return requestJson<BackendCalendarEvent>(`/admin/calendar/events/${eventId}/notes`, {
+    method: 'POST',
+    token,
+    body: { note },
+  });
+}
+
+export async function deleteAdminCalendarEvent(
+  token: string,
+  eventId: string,
+): Promise<{ status: string }> {
+  return requestJson<{ status: string }>(`/admin/calendar/events/${eventId}`, {
+    method: 'DELETE',
+    token,
   });
 }
 

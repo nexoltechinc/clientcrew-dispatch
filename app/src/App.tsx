@@ -10,6 +10,7 @@ import TechnicianSignupPage from '@/pages/auth/TechnicianSignup';
 
 // Admin Pages
 import AdminDashboard from '@/pages/admin/Dashboard';
+import CalendarPage from '@/pages/admin/Calendar';
 import JobsPage from '@/pages/admin/Jobs';
 import JobDetailPage from '@/pages/admin/JobDetail';
 import InvoiceApprovalsPage from '@/pages/admin/InvoiceApprovals';
@@ -139,6 +140,7 @@ function App() {
                 <AdminLayout>
                   <Routes>
                     <Route index element={<AdminDashboard />} />
+                    <Route path="calendar" element={<CalendarPage />} />
                     <Route path="jobs" element={<JobsPage />} />
                     <Route path="jobs/:jobId" element={<JobDetailPage />} />
                     <Route path="invoice-approvals" element={<InvoiceApprovalsPage />} />
