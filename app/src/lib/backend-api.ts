@@ -602,7 +602,7 @@ export async function fetchDevAdminToken(payload: {
   email: string;
   password: string;
 }): Promise<DevAdminTokenResponse> {
-  return requestJson<DevAdminTokenResponse>('/auth/dev/admin-token', {
+  return requestJson<DevAdminTokenResponse>('/auth/admin-token', {
     method: 'POST',
     body: payload,
   });
@@ -612,7 +612,7 @@ export async function fetchDevTechnicianToken(payload: {
   email: string;
   password: string;
 }): Promise<DevTechnicianTokenResponse> {
-  return requestJson<DevTechnicianTokenResponse>('/auth/dev/technician-token', {
+  return requestJson<DevTechnicianTokenResponse>('/auth/technician-token', {
     method: 'POST',
     body: payload,
   });

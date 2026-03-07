@@ -41,12 +41,13 @@ class DevAdminTokenRequest(BaseModel):
     password: str = Field(..., min_length=1, max_length=255)
 
 
-@router.post("/dev/admin-token", response_model=DevTokenResponse)
-def create_dev_admin_token(
+def _create_admin_token(
     payload: DevAdminTokenRequest,
-    db: Session = Depends(deps.get_db),
+    db: Session,
+    *,
+    require_development_env: bool,
 ):
-    if APP_ENV != "development":
+    if require_development_env and APP_ENV != "development":
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Not found",
@@ -68,12 +69,13 @@ def create_dev_admin_token(
     )
 
 
-@router.post("/dev/technician-token", response_model=DevTokenResponse)
-def create_dev_technician_token(
+def _create_technician_token(
     payload: DevTechnicianTokenRequest,
-    db: Session = Depends(deps.get_db),
+    db: Session,
+    *,
+    require_development_env: bool,
 ):
-    if APP_ENV != "development":
+    if require_development_env and APP_ENV != "development":
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Not found",
@@ -106,6 +108,38 @@ def create_dev_technician_token(
         expires_at=expires_at,
         role=UserRole.TECHNICIAN,
     )
+
+
+@router.post("/admin-token", response_model=DevTokenResponse)
+def create_admin_token(
+    payload: DevAdminTokenRequest,
+    db: Session = Depends(deps.get_db),
+):
+    return _create_admin_token(payload, db, require_development_env=False)
+
+
+@router.post("/technician-token", response_model=DevTokenResponse)
+def create_technician_token(
+    payload: DevTechnicianTokenRequest,
+    db: Session = Depends(deps.get_db),
+):
+    return _create_technician_token(payload, db, require_development_env=False)
+
+
+@router.post("/dev/admin-token", response_model=DevTokenResponse)
+def create_dev_admin_token(
+    payload: DevAdminTokenRequest,
+    db: Session = Depends(deps.get_db),
+):
+    return _create_admin_token(payload, db, require_development_env=True)
+
+
+@router.post("/dev/technician-token", response_model=DevTokenResponse)
+def create_dev_technician_token(
+    payload: DevTechnicianTokenRequest,
+    db: Session = Depends(deps.get_db),
+):
+    return _create_technician_token(payload, db, require_development_env=True)
 
 
 @router.post("/forgot-password", response_model=ForgotPasswordResponse)
