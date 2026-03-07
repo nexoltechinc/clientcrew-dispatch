@@ -1,0 +1,47 @@
+services:
+  - type: web
+    name: clientcrew-dispatch
+    runtime: python
+    repo: https://github.com/nexoltechinc/clientcrew-dispatch
+    branch: main
+    rootDir: app/backend
+    plan: free
+    autoDeploy: true
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /
+    envVars:
+      - key: APP_ENV
+        value: production
+      - key: DATABASE_URL
+        sync: false
+      - key: JWT_SECRET_KEY
+        sync: false
+      - key: JWT_ALGORITHM
+        value: HS256
+      - key: ADMIN_EMAIL
+        value: nexoltechsolutionsinc@gmail.com
+      - key: ADMIN_RECOVERY_EMAIL
+        value: nexoltechsolutionsinc@gmail.com
+      - key: ADMIN_DEFAULT_PASSWORD
+        value: admin123
+      - key: CORS_ALLOW_ORIGINS
+        value: https://clientcrew-dispatch.vercel.app,https://clientcrew-dispatch.onrender.com
+      - key: SMTP_EMAIL
+        value: nexoltechsolutionsinc@gmail.com
+      - key: SMTP_APP_PASSWORD
+        sync: false
+      - key: SMTP_HOST
+        value: smtp.gmail.com
+      - key: SMTP_PORT
+        value: "587"
+      - key: SMTP_FROM_NAME
+        value: ClientCrew Dispatch
+      - key: PASSWORD_RESET_OTP_TTL_MINUTES
+        value: "5"
+      - key: PASSWORD_RESET_TOKEN_TTL_MINUTES
+        value: "10"
+      - key: PASSWORD_RESET_MAX_ATTEMPTS
+        value: "3"
+      - key: PASSWORD_RESET_MAX_REQUESTS_PER_HOUR
+        value: "3"
