@@ -2,7 +2,8 @@ import argparse
 import pathlib
 import sys
 from dataclasses import dataclass
-from datetime import datetime, time, timezone
+from datetime import date, datetime, time, timezone
+from decimal import Decimal, ROUND_HALF_UP
 from typing import Iterable
 
 from sqlalchemy import and_, create_engine, insert, select, text
@@ -14,9 +15,12 @@ BACKEND_ROOT = SCRIPT_DIR.parent
 if str(BACKEND_ROOT) not in sys.path:
     sys.path.insert(0, str(BACKEND_ROOT))
 
-from app.core.config import DATABASE_URL
-from app.models import Job, JobService, Skill, Technician, WorkingHours, Zone, technician_skills, technician_zones
+from app.core.config import COMPANY_CITY, COMPANY_EMAIL, COMPANY_NAME, COMPANY_PHONE, COMPANY_STATE, COMPANY_STREET_ADDRESS, COMPANY_WEBSITE, COMPANY_ZIP_CODE, DATABASE_URL
+from app.core.job_status import DispatchJobStatus, db_status_from_dispatch_status
+from app.models import Dealership, Invoice, InvoiceLineItem, Job, JobService, Skill, Technician, WorkingHours, Zone, technician_skills, technician_zones
 from app.models.base import Base
+from app.services.job_services_service import JobServicesService
+from app.services.service_catalog_service import ServiceCatalogService
 
 
 @dataclass(frozen=True)
@@ -41,7 +45,7 @@ MIGRATIONS: list[Migration] = [
 
 
 def parse_args() -> argparse.Namespace:
-    parser = argparse.ArgumentParser(description="Run SM2 backend schema migrations")
+    parser = argparse.ArgumentParser(description="Run DispatchIQ backend schema migrations")
     parser.add_argument(
         "--with-seed",
         action="store_true",
@@ -202,8 +206,19 @@ def backfill_job_services(engine) -> None:
             session.commit()
 
 
+def _money(value: Decimal | int | float | str) -> Decimal:
+    return Decimal(str(value)).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
+
+
+def _tax_amount(amount: Decimal, rate: Decimal) -> Decimal:
+    return _money(amount * rate)
+
+
 def seed_development_data(engine) -> None:
     with Session(engine) as session:
+        # Seed the service catalog first so demo jobs can resolve catalog ids and prices.
+        ServiceCatalogService(session).list_admin_services()
+
         zone_names = ["Quebec", "Levis", "Donnacona", "St-Raymond"]
         skill_names = [
             "PPF",
@@ -216,39 +231,51 @@ def seed_development_data(engine) -> None:
         ]
 
         technicians = [
-            {"name": "Jolianne", "email": "jolianne@sm2dispatch.com", "phone": "418-896-1296"},
-            {"name": "Victor", "email": "victor@sm2dispatch.com", "phone": None},
-            {"name": "Maxime", "email": "maxime@sm2dispatch.com", "phone": None},
-            {"name": "Dany", "email": "dany@sm2dispatch.com", "phone": "418-806-3649"},
+            {"name": "Taylor Brooks", "email": "jolianne@dispatchiq.test", "phone": "418-896-1296", "password": "tech123"},
+            {"name": "Jordan Lee", "email": "victor@dispatchiq.test", "phone": None, "password": "tech123"},
+            {"name": "Casey Patel", "email": "maxime@dispatchiq.test", "phone": None, "password": "tech123"},
+            {"name": "Riley Carter", "email": "dany@dispatchiq.test", "phone": "418-806-3649", "password": "tech123"},
+            {
+                "name": "Alex Morgan",
+                "email": "tech@dispatchiq.test",
+                "phone": "+1 (555) 234-5678",
+                "password": "tech123",
+            },
         ]
 
         zone_assignments = [
-            ("jolianne@sm2dispatch.com", "Quebec"),
-            ("jolianne@sm2dispatch.com", "Levis"),
-            ("jolianne@sm2dispatch.com", "Donnacona"),
-            ("jolianne@sm2dispatch.com", "St-Raymond"),
-            ("victor@sm2dispatch.com", "Donnacona"),
-            ("victor@sm2dispatch.com", "St-Raymond"),
-            ("victor@sm2dispatch.com", "Quebec"),
-            ("victor@sm2dispatch.com", "Levis"),
-            ("maxime@sm2dispatch.com", "Donnacona"),
-            ("maxime@sm2dispatch.com", "St-Raymond"),
-            ("maxime@sm2dispatch.com", "Quebec"),
-            ("maxime@sm2dispatch.com", "Levis"),
-            ("dany@sm2dispatch.com", "Quebec"),
+            ("jolianne@dispatchiq.test", "Quebec"),
+            ("jolianne@dispatchiq.test", "Levis"),
+            ("jolianne@dispatchiq.test", "Donnacona"),
+            ("jolianne@dispatchiq.test", "St-Raymond"),
+            ("victor@dispatchiq.test", "Donnacona"),
+            ("victor@dispatchiq.test", "St-Raymond"),
+            ("victor@dispatchiq.test", "Quebec"),
+            ("victor@dispatchiq.test", "Levis"),
+            ("maxime@dispatchiq.test", "Donnacona"),
+            ("maxime@dispatchiq.test", "St-Raymond"),
+            ("maxime@dispatchiq.test", "Quebec"),
+            ("maxime@dispatchiq.test", "Levis"),
+            ("dany@dispatchiq.test", "Quebec"),
+            ("tech@dispatchiq.test", "Quebec"),
+            ("tech@dispatchiq.test", "Levis"),
+            ("tech@dispatchiq.test", "Donnacona"),
+            ("tech@dispatchiq.test", "St-Raymond"),
         ]
 
         skill_assignments = [
-            ("jolianne@sm2dispatch.com", "PPF"),
-            ("victor@sm2dispatch.com", "PPF"),
-            ("victor@sm2dispatch.com", "Window Tint"),
-            ("maxime@sm2dispatch.com", "PPF"),
-            ("maxime@sm2dispatch.com", "Window Tint"),
-            ("dany@sm2dispatch.com", "Windshield replacement"),
-            ("dany@sm2dispatch.com", "Windshield repair"),
-            ("dany@sm2dispatch.com", "Remote starters"),
-            ("dany@sm2dispatch.com", "Vehicle tracking systems"),
-            ("dany@sm2dispatch.com", "Engine immobilizers"),
+            ("jolianne@dispatchiq.test", "PPF"),
+            ("victor@dispatchiq.test", "PPF"),
+            ("victor@dispatchiq.test", "Window Tint"),
+            ("maxime@dispatchiq.test", "PPF"),
+            ("maxime@dispatchiq.test", "Window Tint"),
+            ("dany@dispatchiq.test", "Windshield replacement"),
+            ("dany@dispatchiq.test", "Windshield repair"),
+            ("dany@dispatchiq.test", "Remote starters"),
+            ("dany@dispatchiq.test", "Vehicle tracking systems"),
+            ("dany@dispatchiq.test", "Engine immobilizers"),
+            ("tech@dispatchiq.test", "PPF"),
+            ("tech@dispatchiq.test", "Window Tint"),
         ]
 
         schedule = [
@@ -259,6 +286,102 @@ def seed_development_data(engine) -> None:
             (4, True, time(8, 0), time(17, 0)),
             (5, True, time(8, 0), time(15, 0)),
             (6, False, time(9, 0), time(17, 0)),
+        ]
+
+        dealerships = [
+            {
+                "code": "D-101",
+                "name": "Northwind Auto",
+                "phone": "581-705-8089",
+                "email": "comptabilite@audidequebec.com",
+                "address": "5200 rue John Molson",
+                "city": "Quebec",
+                "postal_code": "G1X 3X4",
+            },
+            {
+                "code": "D-102",
+                "name": "Summit Motors",
+                "phone": "(418) 285-0970",
+                "email": "dthibault@germainnissan.ca",
+                "address": "104 rue commerciale",
+                "city": "Donnacona",
+                "postal_code": "G3M 1W1",
+            },
+            {
+                "code": "D-103",
+                "name": "Harbor Toyota",
+                "phone": "",
+                "email": "",
+                "address": "565 Cote Joyeuse",
+                "city": "St-Raymond",
+                "postal_code": "G3L 4B2",
+            },
+            {
+                "code": "D-104",
+                "name": "L'Expert Carrossier Rive-Sud",
+                "phone": "",
+                "email": "magasinierauto@corrossier.expert",
+                "address": "250 Av. Taniata",
+                "city": "Levis",
+                "postal_code": "G6W 5M6",
+            },
+        ]
+
+        demo_jobs = [
+            {
+                "job_code": "DIQ-DEMO-1001",
+                "dispatch_status": DispatchJobStatus.IN_PROGRESS,
+                "dealership_code": "D-101",
+                "service_names": ["Full Fender Protection (2 panels)", "Front Window Tint"],
+                "vehicle": "2024 Audi Q5 Technik",
+                "requested_service_date": date(2026, 4, 28),
+                "requested_service_time": time(9, 30),
+                "zone_name": "Quebec",
+            },
+            {
+                "job_code": "DIQ-DEMO-1002",
+                "dispatch_status": DispatchJobStatus.DELAYED,
+                "dealership_code": "D-102",
+                "service_names": ["Hood Protection Strip 18\"", "Roof Protection Strip 6\""],
+                "vehicle": "2025 Nissan Rogue Platinum",
+                "requested_service_date": date(2026, 4, 29),
+                "requested_service_time": time(11, 0),
+                "zone_name": "Donnacona",
+            },
+            {
+                "job_code": "DIQ-DEMO-1003",
+                "dispatch_status": DispatchJobStatus.PENDING,
+                "dealership_code": "D-103",
+                "service_names": ["Full Vehicle Tint"],
+                "vehicle": "2024 Toyota Highlander Limited",
+                "requested_service_date": date(2026, 4, 30),
+                "requested_service_time": time(13, 30),
+                "zone_name": "St-Raymond",
+            },
+            {
+                "job_code": "DIQ-DEMO-1004",
+                "dispatch_status": DispatchJobStatus.COMPLETED,
+                "dealership_code": "D-104",
+                "service_names": ["Rear Bumper Protection Strip"],
+                "vehicle": "2023 Honda Civic Touring",
+                "requested_service_date": date(2026, 4, 27),
+                "requested_service_time": time(8, 45),
+                "completed_at": datetime(2026, 4, 27, 16, 40, tzinfo=timezone.utc),
+                "zone_name": "Levis",
+            },
+            {
+                "job_code": "DIQ-DEMO-1005",
+                "dispatch_status": DispatchJobStatus.COMPLETED,
+                "dealership_code": "D-101",
+                "service_names": ["Full Fender Protection (2 panels)", "Front Window Tint"],
+                "vehicle": "2026 Audi Q7 Progress Edition",
+                "requested_service_date": date(2026, 4, 28),
+                "requested_service_time": time(15, 0),
+                "completed_at": datetime(2026, 4, 28, 17, 10, tzinfo=timezone.utc),
+                "zone_name": "Quebec",
+                "invoice_number": "INV-1001",
+                "payment_recorded_at": datetime(2026, 4, 28, 17, 35, tzinfo=timezone.utc),
+            },
         ]
 
         for zone_name in zone_names:
@@ -279,6 +402,7 @@ def seed_development_data(engine) -> None:
                         name=row["name"],
                         email=row["email"],
                         phone=row["phone"],
+                        password=row["password"],
                         status="active",
                         manual_availability=True,
                     )
@@ -288,6 +412,34 @@ def seed_development_data(engine) -> None:
                 existing.phone = row["phone"]
                 existing.status = "active"
                 existing.manual_availability = True
+                if not (existing.password or "").strip():
+                    existing.password = row["password"]
+
+        session.flush()
+
+        for row in dealerships:
+            existing = session.query(Dealership).filter(Dealership.code == row["code"]).first()
+            if existing is None:
+                session.add(
+                    Dealership(
+                        code=row["code"],
+                        name=row["name"],
+                        phone=row["phone"] or None,
+                        email=row["email"] or None,
+                        address=row["address"] or None,
+                        city=row["city"] or None,
+                        postal_code=row["postal_code"] or None,
+                        status="active",
+                    )
+                )
+            else:
+                existing.name = row["name"]
+                existing.phone = row["phone"] or None
+                existing.email = row["email"] or None
+                existing.address = row["address"] or None
+                existing.city = row["city"] or None
+                existing.postal_code = row["postal_code"] or None
+                existing.status = "active"
 
         session.flush()
 
@@ -336,11 +488,157 @@ def seed_development_data(engine) -> None:
                 )
 
         seeded_tech_emails = [row["email"] for row in technicians]
-        seeded_tech_ids = session.execute(
-            select(Technician.id).where(Technician.email.in_(seeded_tech_emails))
+        tech_rows = session.execute(
+            select(Technician.id, Technician.email).where(Technician.email.in_(seeded_tech_emails))
         ).all()
+        tech_ids_by_email = {email: tech_id for tech_id, email in tech_rows}
 
-        for tech_id, in seeded_tech_ids:
+        dealership_rows = session.execute(
+            select(Dealership.id, Dealership.code).where(Dealership.code.in_([row["code"] for row in dealerships]))
+        ).all()
+        dealership_ids_by_code = {code: dealership_id for dealership_id, code in dealership_rows}
+
+        zone_rows = session.execute(
+            select(Zone.id, Zone.name).where(Zone.name.in_(zone_names))
+        ).all()
+        zone_ids_by_name = {name: zone_id for zone_id, name in zone_rows}
+
+        jobs_service = JobServicesService(session)
+        for job in demo_jobs:
+            technician_id = tech_ids_by_email.get("tech@dispatchiq.test")
+            dealership_id = dealership_ids_by_code.get(job["dealership_code"])
+            zone_id = zone_ids_by_name.get(job["zone_name"])
+            dealership = next((row for row in dealerships if row["code"] == job["dealership_code"]), None)
+            if technician_id is None or dealership_id is None or dealership is None:
+                continue
+
+            job_row = session.query(Job).filter(Job.job_code == job["job_code"]).first()
+            if job_row is None:
+                job_row = Job(job_code=job["job_code"])
+                session.add(job_row)
+
+            job_row.status = db_status_from_dispatch_status(job["dispatch_status"])
+            job_row.assigned_tech_id = technician_id
+            job_row.dealership_id = dealership_id
+            job_row.zone_id = zone_id
+            job_row.customer_name = dealership["name"]
+            job_row.customer_address = dealership["address"] or None
+            job_row.customer_city = dealership["city"] or None
+            job_row.customer_state = "QC"
+            job_row.customer_zip_code = dealership["postal_code"] or None
+            job_row.ship_to_name = dealership["name"]
+            job_row.ship_to_address = dealership["address"] or None
+            job_row.ship_to_city = dealership["city"] or None
+            job_row.ship_to_state = "QC"
+            job_row.ship_to_zip_code = dealership["postal_code"] or None
+            job_row.service_type = job["service_names"][0]
+            job_row.vehicle = job["vehicle"]
+            job_row.location = dealership["city"] or None
+            job_row.requested_service_date = job["requested_service_date"]
+            job_row.requested_service_time = job["requested_service_time"]
+            job_row.completed_at = job.get("completed_at")
+            job_row.source_system = "demo_seed"
+            job_row.source_metadata = {
+                "seed": True,
+                "scenario": "crm_demo_jobs",
+                "dealership_code": job["dealership_code"],
+                "technician_email": "tech@dispatchiq.test",
+                "service_names": job["service_names"],
+            }
+
+            session.flush()
+            jobs_service.replace_services(
+                job=job_row,
+                service_names=job["service_names"],
+                source="dealership",
+                created_by_user_id=None,
+            )
+
+            invoice_number = job.get("invoice_number")
+            if not invoice_number:
+                continue
+
+            service_rows = jobs_service.list_service_rows(job_row)
+            if not service_rows:
+                continue
+
+            invoice_date = job["requested_service_date"]
+            due_date = date.fromordinal(invoice_date.toordinal() + 15)
+            tax_rate = Decimal("0.14975")
+            invoice_status = "paid"
+            bill_to_name = dealership["name"]
+            bill_to_address = dealership["address"]
+            bill_to_city = dealership["city"]
+            bill_to_state = "QC"
+            bill_to_zip_code = dealership["postal_code"]
+            line_amounts: list[Decimal] = []
+            line_tax_amounts: list[Decimal] = []
+
+            invoice = session.query(Invoice).filter(Invoice.invoice_number == invoice_number).first()
+            if invoice is None:
+                invoice = Invoice(invoice_number=invoice_number)
+                session.add(invoice)
+
+            invoice.company_logo_url = None
+            invoice.company_name = COMPANY_NAME
+            invoice.company_street_address = COMPANY_STREET_ADDRESS
+            invoice.company_city = COMPANY_CITY
+            invoice.company_state = COMPANY_STATE
+            invoice.company_zip_code = COMPANY_ZIP_CODE
+            invoice.company_phone = COMPANY_PHONE
+            invoice.company_email = COMPANY_EMAIL
+            invoice.company_website = COMPANY_WEBSITE
+            invoice.bill_to_name = bill_to_name
+            invoice.bill_to_address = bill_to_address
+            invoice.bill_to_city = bill_to_city
+            invoice.bill_to_state = bill_to_state
+            invoice.bill_to_zip_code = bill_to_zip_code
+            invoice.ship_to_name = bill_to_name
+            invoice.ship_to_address = bill_to_address
+            invoice.ship_to_city = bill_to_city
+            invoice.ship_to_state = bill_to_state
+            invoice.ship_to_zip_code = bill_to_zip_code
+            invoice.invoice_date = invoice_date
+            invoice.terms = "NET_15"
+            invoice.custom_term_days = None
+            invoice.due_date = due_date
+            invoice.shipping = Decimal("0.00")
+            invoice.customer_message = "Sample CRM invoice seeded for demo visibility."
+            invoice.approval_note = "Paid sample invoice linked to completed CRM demo job."
+            invoice.status = invoice_status
+            invoice.payment_recorded_at = job.get("payment_recorded_at")
+            invoice.voided_at = None
+
+            invoice.line_items.clear()
+            for index, row in enumerate(service_rows):
+                amount = _money(row.quantity * row.unit_price)
+                line_tax_amount = _tax_amount(amount, tax_rate)
+                line_amounts.append(amount)
+                line_tax_amounts.append(line_tax_amount)
+                invoice.line_items.append(
+                    InvoiceLineItem(
+                        job_id=job_row.id,
+                        product_service=row.service_name_snapshot,
+                        qb_item_id=None,
+                        description=f"{job_row.job_code} | {job_row.vehicle} | {row.service_name_snapshot}",
+                        quantity=_money(row.quantity),
+                        rate=_money(row.unit_price),
+                        amount=amount,
+                        tax_code="GST_QST",
+                        tax_rate=tax_rate,
+                        tax_amount=line_tax_amount,
+                        line_order=index,
+                    )
+                )
+
+            invoice.subtotal = _money(sum(line_amounts, Decimal("0.00")))
+            invoice.sales_tax = _money(sum(line_tax_amounts, Decimal("0.00")))
+            invoice.total = _money(invoice.subtotal + invoice.sales_tax + invoice.shipping)
+            job_row.invoice = invoice
+
+        for tech_id, in session.execute(
+            select(Technician.id).where(Technician.email.in_(seeded_tech_emails))
+        ).all():
             for day_of_week, is_enabled, start_time, end_time in schedule:
                 row = (
                     session.query(WorkingHours)
@@ -387,7 +685,7 @@ def run() -> None:
         else:
             print(f"APPLY {version}")
 
-    if args.with_seed and "003_technician.sql" in pending:
+    if args.with_seed:
         seed_development_data(engine)
 
     backfill_job_services(engine)
@@ -402,3 +700,4 @@ def run() -> None:
 
 if __name__ == "__main__":
     run()
+

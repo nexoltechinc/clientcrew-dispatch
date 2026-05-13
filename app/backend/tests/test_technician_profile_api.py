@@ -110,33 +110,33 @@ class TechnicianProfileApiTests(unittest.TestCase):
             )
 
     def test_email_change_request_creates_pending_record(self):
-        tech = self._seed_technician(name="Jolianne", email="jolianne@sm2dispatch.com")
+        tech = self._seed_technician(name="Taylor Brooks", email="jolianne@dispatchiq.test")
         tech_auth = self._technician_auth_header(email=tech.email)
 
         res = self.client.post(
             "/technicians/me/email-change-request",
-            json={"requested_email": "jolianne.updated@sm2dispatch.com"},
+            json={"requested_email": "jolianne.updated@dispatchiq.test"},
             headers=tech_auth,
         )
         self.assertEqual(res.status_code, 201, res.text)
         payload = res.json()
         self.assertEqual(payload["status"], "PENDING")
-        self.assertEqual(payload["current_email"], "jolianne@sm2dispatch.com")
-        self.assertEqual(payload["requested_email"], "jolianne.updated@sm2dispatch.com")
+        self.assertEqual(payload["current_email"], "jolianne@dispatchiq.test")
+        self.assertEqual(payload["requested_email"], "jolianne.updated@dispatchiq.test")
 
         me_res = self.client.get("/technicians/me", headers=tech_auth)
         self.assertEqual(me_res.status_code, 200, me_res.text)
         me_payload = me_res.json()
-        self.assertEqual(me_payload["email"], "jolianne@sm2dispatch.com")
+        self.assertEqual(me_payload["email"], "jolianne@dispatchiq.test")
         self.assertTrue(me_payload["has_pending_email_change_request"])
 
     def test_admin_approve_updates_email(self):
-        tech = self._seed_technician(name="Victor", email="victor@sm2dispatch.com")
+        tech = self._seed_technician(name="Jordan Lee", email="victor@dispatchiq.test")
         tech_auth = self._technician_auth_header(email=tech.email)
 
         request_res = self.client.post(
             "/technicians/me/email-change-request",
-            json={"requested_email": "victor.new@sm2dispatch.com"},
+            json={"requested_email": "victor.new@dispatchiq.test"},
             headers=tech_auth,
         )
         self.assertEqual(request_res.status_code, 201, request_res.text)
@@ -152,15 +152,15 @@ class TechnicianProfileApiTests(unittest.TestCase):
 
         me_res = self.client.get("/technicians/me", headers=tech_auth)
         self.assertEqual(me_res.status_code, 200, me_res.text)
-        self.assertEqual(me_res.json()["email"], "victor.new@sm2dispatch.com")
+        self.assertEqual(me_res.json()["email"], "victor.new@dispatchiq.test")
 
     def test_admin_reject_does_not_update_email(self):
-        tech = self._seed_technician(name="Maxime", email="maxime@sm2dispatch.com")
+        tech = self._seed_technician(name="Casey Patel", email="maxime@dispatchiq.test")
         tech_auth = self._technician_auth_header(email=tech.email)
 
         request_res = self.client.post(
             "/technicians/me/email-change-request",
-            json={"requested_email": "maxime.new@sm2dispatch.com"},
+            json={"requested_email": "maxime.new@dispatchiq.test"},
             headers=tech_auth,
         )
         self.assertEqual(request_res.status_code, 201, request_res.text)
@@ -176,10 +176,10 @@ class TechnicianProfileApiTests(unittest.TestCase):
 
         me_res = self.client.get("/technicians/me", headers=tech_auth)
         self.assertEqual(me_res.status_code, 200, me_res.text)
-        self.assertEqual(me_res.json()["email"], "maxime@sm2dispatch.com")
+        self.assertEqual(me_res.json()["email"], "maxime@dispatchiq.test")
 
     def test_integration_availability_and_email_request_visible_to_admin(self):
-        tech = self._seed_technician(name="Dany", email="dany@sm2dispatch.com")
+        tech = self._seed_technician(name="Riley Carter", email="dany@dispatchiq.test")
         tech_auth = self._technician_auth_header(email=tech.email)
 
         availability_res = self.client.put(
@@ -212,7 +212,7 @@ class TechnicianProfileApiTests(unittest.TestCase):
 
         request_res = self.client.post(
             "/technicians/me/email-change-request",
-            json={"requested_email": "dany.new@sm2dispatch.com"},
+            json={"requested_email": "dany.new@dispatchiq.test"},
             headers=tech_auth,
         )
         self.assertEqual(request_res.status_code, 201, request_res.text)
@@ -223,7 +223,7 @@ class TechnicianProfileApiTests(unittest.TestCase):
         pending_row = next((row for row in list_with_pending_res.json() if row["id"] == str(tech.id)), None)
         self.assertIsNotNone(pending_row)
         self.assertTrue(pending_row["has_pending_email_change_request"])
-        self.assertEqual(pending_row["pending_email_change_requested_email"], "dany.new@sm2dispatch.com")
+        self.assertEqual(pending_row["pending_email_change_requested_email"], "dany.new@dispatchiq.test")
 
         approve_res = self.client.post(
             f"/admin/email-change-requests/{request_id}/approve",
@@ -237,8 +237,9 @@ class TechnicianProfileApiTests(unittest.TestCase):
         approved_row = next((row for row in list_after_approve_res.json() if row["id"] == str(tech.id)), None)
         self.assertIsNotNone(approved_row)
         self.assertFalse(approved_row["has_pending_email_change_request"])
-        self.assertEqual(approved_row["email"], "dany.new@sm2dispatch.com")
+        self.assertEqual(approved_row["email"], "dany.new@dispatchiq.test")
 
 
 if __name__ == "__main__":
     unittest.main()
+

@@ -199,6 +199,8 @@ export default function InvoiceApprovalsPage() {
         ),
     ).sort((a, b) => a.localeCompare(b)), [invoices]);
 
+    const hasActiveFilters = searchQuery.trim().length > 0 || filterDealership !== 'all' || filterTechnician !== 'all';
+
     const filteredInvoices = useMemo(() => invoices.filter((invoice) => {
         const query = searchQuery.toLowerCase().trim();
         const technicianName = invoice.technician_name || '';
@@ -217,6 +219,33 @@ export default function InvoiceApprovalsPage() {
             technicianName.toLowerCase() === filterTechnician.toLowerCase();
         return matchesSearch && matchesDealership && matchesTechnician;
     }), [filterDealership, filterTechnician, invoices, searchQuery]);
+
+    const queueSummary = useMemo(() => {
+        const customerNames = new Set<string>();
+        let estimatedTotal = 0;
+
+        filteredInvoices.forEach((invoice) => {
+            const customerName = invoice.dealership_name.trim();
+            if (customerName.length > 0) {
+                customerNames.add(customerName);
+            }
+            estimatedTotal += toNumber(invoice.estimated_total);
+        });
+
+        return {
+            visibleCount: filteredInvoices.length,
+            totalCount: invoices.length,
+            blockedCount: blockedInvoices.length,
+            estimatedTotal,
+            customerCount: customerNames.size,
+        };
+    }, [blockedInvoices, filteredInvoices, invoices]);
+
+    const handleClearFilters = () => {
+        setSearchQuery('');
+        setFilterDealership('all');
+        setFilterTechnician('all');
+    };
 
     const serviceNameOptions = useMemo(() => {
         const combined = [...serviceSuggestions, ...editableServices.map((service) => service.name)];
@@ -472,9 +501,57 @@ export default function InvoiceApprovalsPage() {
                 onConfirm={handleExport}
             />
 
+            <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+                <Card className="border-border/60 bg-card/80 p-4 shadow-sm backdrop-blur">
+                    <p className="text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">Pending approvals</p>
+                    <div className="mt-3 flex items-end justify-between gap-4">
+                        <div>
+                            <p className="text-3xl font-bold text-foreground">{queueSummary.visibleCount}</p>
+                            <p className="text-xs text-muted-foreground">{queueSummary.totalCount} total jobs in queue</p>
+                        </div>
+                        <Badge variant="outline" className="border-amber-500/30 bg-amber-500/10 text-amber-300">
+                            Needs review
+                        </Badge>
+                    </div>
+                </Card>
+
+                <Card className="border-border/60 bg-card/80 p-4 shadow-sm backdrop-blur">
+                    <p className="text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">Estimated value</p>
+                    <div className="mt-3 flex items-end justify-between gap-4">
+                        <div>
+                            <p className="text-3xl font-bold text-foreground">${queueSummary.estimatedTotal.toFixed(2)}</p>
+                            <p className="text-xs text-muted-foreground">Across the current filtered queue</p>
+                        </div>
+                        <DollarSign className="h-5 w-5 text-emerald-300" />
+                    </div>
+                </Card>
+
+                <Card className="border-border/60 bg-card/80 p-4 shadow-sm backdrop-blur">
+                    <p className="text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">Customers involved</p>
+                    <div className="mt-3 flex items-end justify-between gap-4">
+                        <div>
+                            <p className="text-3xl font-bold text-foreground">{queueSummary.customerCount}</p>
+                            <p className="text-xs text-muted-foreground">Unique dealerships in view</p>
+                        </div>
+                        <User className="h-5 w-5 text-cyan-300" />
+                    </div>
+                </Card>
+
+                <Card className="border-border/60 bg-card/80 p-4 shadow-sm backdrop-blur">
+                    <p className="text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">Blocked jobs</p>
+                    <div className="mt-3 flex items-end justify-between gap-4">
+                        <div>
+                            <p className="text-3xl font-bold text-foreground">{queueSummary.blockedCount}</p>
+                            <p className="text-xs text-muted-foreground">Need data fixes before invoicing</p>
+                        </div>
+                        <ShieldAlert className="h-5 w-5 text-amber-300" />
+                    </div>
+                </Card>
+            </div>
+
             <Card className="space-y-4 border-border/60 bg-card/80 p-4 shadow-sm backdrop-blur">
-                <div className="flex flex-col lg:flex-row gap-4 items-center">
-                    <div className="relative flex-1 w-full lg:w-auto min-w-0 lg:min-w-[300px]">
+                <div className="grid gap-3 xl:grid-cols-[minmax(0,1fr)_auto] xl:items-center">
+                    <div className="relative min-w-0">
                         <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                         <Input
                             placeholder="Search by Job Code, Customer, or VIN..."
@@ -483,7 +560,7 @@ export default function InvoiceApprovalsPage() {
                             onChange={(e) => setSearchQuery(e.target.value)}
                         />
                     </div>
-                    <div className="flex flex-wrap items-center gap-2 w-full lg:w-auto">
+                    <div className="flex flex-wrap items-center gap-2">
                         <Select value={filterDealership} onValueChange={setFilterDealership}>
                             <SelectTrigger className="w-full border-dashed border-border/60 bg-background/60 text-foreground sm:w-[170px]">
                                 <div className="flex items-center gap-2">
@@ -516,11 +593,29 @@ export default function InvoiceApprovalsPage() {
                                 ))}
                             </SelectContent>
                         </Select>
-                        <div className="mx-2 h-6 w-px bg-border/70" />
-                        <Button variant="secondary" className="border border-amber-500/30 bg-amber-500/10 text-amber-300 hover:bg-amber-500/20">
-                            All Pending ({filteredInvoices.length})
+                        <Badge variant="outline" className="border-amber-500/30 bg-amber-500/10 text-amber-300">
+                            Pending Queue ({queueSummary.visibleCount})
+                        </Badge>
+                        <Button
+                            variant="ghost"
+                            className="text-muted-foreground hover:bg-muted/50 hover:text-foreground"
+                            onClick={handleClearFilters}
+                            disabled={!hasActiveFilters}
+                        >
+                            Clear filters
                         </Button>
                     </div>
+                </div>
+                <div className="flex flex-wrap items-center gap-2 text-xs">
+                    <Badge variant="outline" className="border-border/60 bg-background/60 text-muted-foreground">
+                        Showing {queueSummary.visibleCount} of {queueSummary.totalCount} jobs
+                    </Badge>
+                    <Badge variant="outline" className="border-border/60 bg-background/60 text-muted-foreground">
+                        {queueSummary.blockedCount} blocked
+                    </Badge>
+                    <Badge variant="outline" className="border-border/60 bg-background/60 text-muted-foreground">
+                        {queueSummary.customerCount} customers
+                    </Badge>
                 </div>
             </Card>
 
@@ -545,23 +640,24 @@ export default function InvoiceApprovalsPage() {
                         <Button
                             variant="outline"
                             className="mt-4"
-                            onClick={() => { setSearchQuery(''); setFilterDealership('all'); setFilterTechnician('all'); }}
+                            onClick={handleClearFilters}
                         >
-                            Clear Filters
+                            Clear filters
                         </Button>
                     </div>
                 ) : (
-                    <Table>
-                        <TableHeader className="sticky top-0 z-10 bg-muted/30">
+                    <div className="overflow-x-auto">
+                    <Table className="table-fixed">
+                        <TableHeader className="sticky top-0 z-10 bg-muted/30 backdrop-blur">
                             <TableRow>
-                                <TableHead className="w-[180px] pl-6 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Job Code</TableHead>
-                                <TableHead className="w-[200px] text-xs font-semibold uppercase tracking-wider text-muted-foreground">Customer</TableHead>
+                                <TableHead className="w-[160px] pl-6 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Job Code</TableHead>
+                                <TableHead className="w-[210px] text-xs font-semibold uppercase tracking-wider text-muted-foreground">Customer</TableHead>
                                 <TableHead className="w-[180px] text-xs font-semibold uppercase tracking-wider text-muted-foreground">Technician</TableHead>
-                                <TableHead className="w-[150px] text-xs font-semibold uppercase tracking-wider text-muted-foreground">Completed At</TableHead>
-                                <TableHead className="w-[180px] text-xs font-semibold uppercase tracking-wider text-muted-foreground">Service</TableHead>
+                                <TableHead className="hidden lg:table-cell w-[140px] text-xs font-semibold uppercase tracking-wider text-muted-foreground">Completed At</TableHead>
+                                <TableHead className="hidden xl:table-cell w-[260px] text-xs font-semibold uppercase tracking-wider text-muted-foreground">Service</TableHead>
                                 <TableHead className="w-[120px] text-right text-xs font-semibold uppercase tracking-wider text-muted-foreground">Est. Total</TableHead>
-                                <TableHead className="w-[140px] text-center text-xs font-semibold uppercase tracking-wider text-muted-foreground">Status</TableHead>
-                                <TableHead className="w-[100px] text-right pr-6">Action</TableHead>
+                                <TableHead className="w-[130px] text-center text-xs font-semibold uppercase tracking-wider text-muted-foreground">Status</TableHead>
+                                <TableHead className="w-[120px] text-right pr-6 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Action</TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>
@@ -571,8 +667,19 @@ export default function InvoiceApprovalsPage() {
                                     className="group cursor-pointer border-border/40 transition-colors hover:bg-muted/20"
                                     onClick={() => handleOpenDrawer(inv)}
                                 >
-                                    <TableCell className="pl-6 font-medium text-foreground group-hover:text-cyan-300">{inv.job_code}</TableCell>
-                                    <TableCell className="text-muted-foreground">{inv.dealership_name}</TableCell>
+                                    <TableCell className="pl-6 align-top font-medium text-foreground group-hover:text-cyan-300">
+                                        <div className="space-y-1">
+                                            <div>{inv.job_code}</div>
+                                            <div className="text-xs text-muted-foreground">{inv.vehicle_summary}</div>
+                                            <div className="text-xs text-cyan-200/80 xl:hidden">{inv.service_summary}</div>
+                                        </div>
+                                    </TableCell>
+                                    <TableCell className="align-top text-muted-foreground">
+                                        <div className="space-y-1">
+                                            <div>{inv.dealership_name}</div>
+                                            <div className="text-xs text-muted-foreground sm:hidden">{inv.service_summary}</div>
+                                        </div>
+                                    </TableCell>
                                     <TableCell>
                                         <div className="flex items-center gap-2">
                                             <div className="flex h-6 w-6 items-center justify-center rounded-full bg-emerald-500/15 text-[10px] font-bold text-emerald-300">
@@ -581,16 +688,27 @@ export default function InvoiceApprovalsPage() {
                                             <span className="text-sm text-foreground">{inv.technician_name || 'Unassigned'}</span>
                                         </div>
                                     </TableCell>
-                                    <TableCell className="font-mono text-xs text-muted-foreground">
+                                    <TableCell className="hidden lg:table-cell align-top font-mono text-xs text-muted-foreground">
                                         {inv.completed_at ? new Date(inv.completed_at).toLocaleDateString() : '-'}
                                     </TableCell>
-                                    <TableCell className="max-w-[180px] truncate text-muted-foreground">{inv.service_summary}</TableCell>
-                                    <TableCell className="text-right font-mono font-medium text-foreground">${toNumber(inv.estimated_total).toFixed(2)}</TableCell>
-                                    <TableCell className="text-center">
+                                    <TableCell className="hidden xl:table-cell align-top max-w-[260px] truncate text-muted-foreground" title={inv.service_summary}>
+                                        {inv.service_summary}
+                                    </TableCell>
+                                    <TableCell className="align-top text-right font-mono font-medium text-foreground">${toNumber(inv.estimated_total).toFixed(2)}</TableCell>
+                                    <TableCell className="align-top text-center">
                                         <StatusBadge status={inv.invoice_state} />
                                     </TableCell>
-                                    <TableCell className="text-right pr-6">
-                                        <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                                    <TableCell className="align-top text-right pr-6">
+                                        <Button
+                                            variant="outline"
+                                            size="sm"
+                                            className="h-8 gap-1.5 border-border/60 bg-background/60 text-foreground hover:bg-muted/40"
+                                            onClick={(event) => {
+                                                event.stopPropagation();
+                                                handleOpenDrawer(inv);
+                                            }}
+                                        >
+                                            Review
                                             <ChevronRight className="h-4 w-4 text-muted-foreground" />
                                         </Button>
                                     </TableCell>
@@ -598,6 +716,7 @@ export default function InvoiceApprovalsPage() {
                             ))}
                         </TableBody>
                     </Table>
+                    </div>
                 )}
             </div>
 

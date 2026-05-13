@@ -183,7 +183,7 @@ type DealershipOption = {
 
 // --- Reference Data ---
 
-const ADMIN_JOBS_STORAGE_KEY = 'sm_dispatch_admin_jobs';
+const ADMIN_JOBS_STORAGE_KEY = 'dispatchiq_admin_jobs';
 const JOB_EXPORT_COLUMNS = [
     'JobCode',
     'Customer',
@@ -197,7 +197,7 @@ const JOB_EXPORT_COLUMNS = [
     'CreatedAt',
     'UpdatedAt',
 ];
-const ADMIN_REFRESH_EVENT = 'sm-dispatch:admin-refresh';
+const ADMIN_REFRESH_EVENT = 'dispatchiq:admin-refresh';
 
 const EMPTY_QUICK_FILTER_COUNTS: QuickFilterCounts = {
     pendingReview: 0,
@@ -1082,7 +1082,7 @@ export default function JobsPage() {
             ? mapBackendJobToUiJob(createdBackendJob)
             : ({
                 job_id: `job-local-${Date.now()}`,
-                job_code: `SM2-NEW-${String(Date.now()).slice(-6)}`,
+                job_code: `DIQ-NEW-${String(Date.now()).slice(-6)}`,
                 dealership_name: dealershipName,
                 service_name: serviceName,
                 service_names: serviceNamesInput.length > 0 ? serviceNamesInput : [serviceName],
@@ -2372,5 +2372,6 @@ function Building2Icon(props: any) {
         </svg>
     )
 }
+
 
 

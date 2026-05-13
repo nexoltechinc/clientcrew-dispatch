@@ -123,7 +123,7 @@ const getDefaultNewRule = (): Partial<PriorityRule> => ({
     description: ''
 });
 
-const ADMIN_REFRESH_EVENT = 'sm-dispatch:admin-refresh';
+const ADMIN_REFRESH_EVENT = 'dispatchiq:admin-refresh';
 const DEFAULT_ADMIN_EMAIL = 'nexoltechsolutionsinc@gmail.com';
 
 const getDefaultAdminCredentialValues = () => ({
@@ -862,7 +862,7 @@ export default function SettingsPage() {
                                     id="invoice_company_name"
                                     value={invoiceCompany.name}
                                     onChange={(e) => setInvoiceCompany({ ...invoiceCompany, name: e.target.value })}
-                                    placeholder="Client-Crew Dispatch"
+                                    placeholder="DispatchIQ"
                                 />
                             </div>
                             <div className="space-y-2">
@@ -872,7 +872,7 @@ export default function SettingsPage() {
                                     type="email"
                                     value={invoiceCompany.email}
                                     onChange={(e) => setInvoiceCompany({ ...invoiceCompany, email: e.target.value })}
-                                    placeholder="billing@clientcrew-dispatch.com"
+                                    placeholder="billing@dispatchiq.test"
                                 />
                             </div>
                             <div className="space-y-2 sm:col-span-2">
@@ -926,7 +926,7 @@ export default function SettingsPage() {
                                     id="invoice_company_website"
                                     value={invoiceCompany.website}
                                     onChange={(e) => setInvoiceCompany({ ...invoiceCompany, website: e.target.value })}
-                                    placeholder="https://clientcrew-dispatch.vercel.app"
+                                    placeholder="https://dispatchiq.test"
                                 />
                             </div>
                         </div>
@@ -1103,3 +1103,4 @@ export default function SettingsPage() {
         </div>
     );
 }
+

@@ -94,8 +94,8 @@ const generateMockSchedule = (services: string[]): ScheduledJob[] => {
     jobs.push(
         {
             job_id: 'job-sch-1',
-            job_code: 'SM2-2024-1105',
-            dealership_name: getRandom(dealers) || 'Audi de Quebec',
+            job_code: 'DIQ-2024-1105',
+            dealership_name: getRandom(dealers) || 'Northwind Auto',
             service_name: getRandom(services) || 'Bande pare-brise teintee',
             status: 'scheduled',
             urgency: 'high',
@@ -105,8 +105,8 @@ const generateMockSchedule = (services: string[]): ScheduledJob[] => {
         },
         {
             job_id: 'job-sch-2',
-            job_code: 'SM2-2024-1106',
-            dealership_name: getRandom(dealers) || 'Toyota Ste-Foy',
+            job_code: 'DIQ-2024-1106',
+            dealership_name: getRandom(dealers) || 'Lakeside Toyota',
             service_name: getRandom(services) || 'Demarreur 2-Way - Audi',
             status: 'scheduled',
             urgency: 'normal',
@@ -116,8 +116,8 @@ const generateMockSchedule = (services: string[]): ScheduledJob[] => {
         },
         {
             job_id: 'job-sch-3',
-            job_code: 'SM2-2024-1107',
-            dealership_name: getRandom(dealers) || 'Honda Donnacona',
+            job_code: 'DIQ-2024-1107',
+            dealership_name: getRandom(dealers) || 'Pioneer Honda',
             service_name: getRandom(services) || 'Main-d-oeuvre - regulier',
             status: 'in_progress',
             urgency: 'critical',
@@ -132,7 +132,7 @@ const generateMockSchedule = (services: string[]): ScheduledJob[] => {
     jobs.push(
         {
             job_id: 'job-sch-4',
-            job_code: 'SM2-2024-1108',
+            job_code: 'DIQ-2024-1108',
             dealership_name: getRandom(dealers) || 'Metro Auto Center',
             service_name: getRandom(services) || 'PPF capot 12" + ailes',
             status: 'scheduled',
@@ -143,7 +143,7 @@ const generateMockSchedule = (services: string[]): ScheduledJob[] => {
         },
         {
             job_id: 'job-sch-5',
-            job_code: 'SM2-2024-1109',
+            job_code: 'DIQ-2024-1109',
             dealership_name: getRandom(dealers) || 'Valley Motors',
             service_name: getRandom(services) || 'Teintage complet - standard',
             status: 'scheduled',
@@ -159,8 +159,8 @@ const generateMockSchedule = (services: string[]): ScheduledJob[] => {
     jobs.push(
         {
             job_id: 'job-sch-6',
-            job_code: 'SM2-2024-1110',
-            dealership_name: getRandom(dealers) || 'Audi de Quebec',
+            job_code: 'DIQ-2024-1110',
+            dealership_name: getRandom(dealers) || 'Northwind Auto',
             service_name: getRandom(services) || 'Bande pare-brise teintee',
             status: 'scheduled',
             urgency: 'normal',
@@ -170,8 +170,8 @@ const generateMockSchedule = (services: string[]): ScheduledJob[] => {
         },
         {
             job_id: 'job-sch-7',
-            job_code: 'SM2-2024-1111',
-            dealership_name: getRandom(dealers) || 'Toyota Ste-Foy',
+            job_code: 'DIQ-2024-1111',
+            dealership_name: getRandom(dealers) || 'Lakeside Toyota',
             service_name: getRandom(services) || 'Demarreur 2-Way - Audi',
             status: 'scheduled',
             urgency: null,
@@ -188,8 +188,8 @@ const generateMockSchedule = (services: string[]): ScheduledJob[] => {
         if (i % 2 === 0) {
             jobs.push({
                 job_id: `job-sch-${10 + i}`,
-                job_code: `SM2-2024-11${10 + i}`,
-                dealership_name: getRandom(dealers) || 'Honda Donnacona',
+                job_code: `DIQ-2024-11${10 + i}`,
+                dealership_name: getRandom(dealers) || 'Pioneer Honda',
                 service_name: getRandom(services) || 'Main-d-oeuvre - regulier',
                 status: 'scheduled',
                 urgency: 'normal',
@@ -627,3 +627,4 @@ export default function SchedulePage() {
         </div>
     );
 }
+

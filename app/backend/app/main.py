@@ -28,7 +28,7 @@ from .models.base import Base
 from .services.job_services_service import JobServicesService
 
 app = FastAPI(
-    title="SM2 Dispatch Technician API",
+    title="DispatchIQ Technician API",
     description="Backend APIs for admin technician profile, scheduling, and availability.",
     version="2.0.0",
 )
@@ -113,4 +113,5 @@ def handle_database_operational_error(_: Request, __: OperationalError):
 
 @app.get("/")
 def root():
-    return {"message": "SM2 Dispatch technician profile APIs are active."}
+    return {"message": "DispatchIQ technician profile APIs are active."}
+

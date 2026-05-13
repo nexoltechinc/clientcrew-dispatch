@@ -20,11 +20,11 @@ class EmailService:
             raise RuntimeError("SMTP_EMAIL and SMTP_APP_PASSWORD must be configured for password reset emails")
 
         message = EmailMessage()
-        message["Subject"] = "Your SM2 Dispatch password reset code"
+        message["Subject"] = "Your DispatchIQ password reset code"
         message["From"] = f"{SMTP_FROM_NAME} <{SMTP_EMAIL}>"
         message["To"] = recipient_email
         message.set_content(
-            f"Your SM2 Dispatch password reset code is {otp_code}. It expires in 5 minutes.",
+            f"Your DispatchIQ password reset code is {otp_code}. It expires in 5 minutes.",
         )
         message.add_alternative(
             self._render_password_reset_template(otp_code=otp_code),
@@ -35,3 +35,4 @@ class EmailService:
             smtp.starttls()
             smtp.login(SMTP_EMAIL, SMTP_APP_PASSWORD)
             smtp.send_message(message)
+

@@ -116,13 +116,13 @@ type ChromeData = {
   syncTone: StatusTone;
 };
 
-const ADMIN_REFRESH_EVENT = 'sm-dispatch:admin-refresh';
-const WORKSPACE_STORAGE_KEY = 'sm_dispatch_workspace_id';
+const ADMIN_REFRESH_EVENT = 'dispatchiq:admin-refresh';
+const WORKSPACE_STORAGE_KEY = 'dispatchiq_workspace_id';
 
 const WORKSPACES: WorkspaceOption[] = [
   {
     id: 'clientcrew',
-    name: 'Client-Crew Dispatch',
+    name: 'DispatchIQ',
     plan: 'Enterprise Plan',
     region: 'Primary workspace',
   },
@@ -1084,3 +1084,4 @@ export function AdminLayout({ children }: { children: ReactNode }) {
     </div>
   );
 }
+

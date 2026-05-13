@@ -12,7 +12,6 @@ import {
   Building2,
   CheckCircle2,
   Clock3,
-  Database,
   FileCheck,
   FilePlus2,
   FileText,
@@ -26,30 +25,12 @@ import {
   UserPlus,
   Users,
 } from 'lucide-react';
-import {
-  Cell,
-  CartesianGrid,
-  Line,
-  LineChart,
-  Pie,
-  PieChart,
-  XAxis,
-  YAxis,
-} from 'recharts';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Skeleton } from '@/components/ui/skeleton';
-import {
-  ChartContainer,
-  ChartLegend,
-  ChartLegendContent,
-  ChartTooltip,
-  ChartTooltipContent,
-  type ChartConfig,
-} from '@/components/ui/chart';
 import {
   fetchAdminDealerships,
   fetchAdminJobs,
@@ -124,37 +105,11 @@ type TechnicianRow = {
   href: string;
 };
 
-type HealthRow = {
-  id: string;
-  label: string;
-  metric: string;
-  status: string;
-  statusTone: StatusTone;
-  icon: ElementType;
-  helperText: string;
-};
-
-type TrendPoint = {
-  day: string;
-  created: number;
-  completed: number;
-  date: Date;
-};
-
-type SourcePoint = {
-  name: string;
-  value: number;
-  color: string;
-};
-
 type DashboardSnapshot = {
   cards: DashboardCard[];
   activity: ActivityRow[];
   urgentJobs: UrgentJobRow[];
   technicians: TechnicianRow[];
-  healthRows: HealthRow[];
-  weeklyTrend: TrendPoint[];
-  sourceBreakdown: SourcePoint[];
   stats: {
     jobs: number;
     technicians: number;
@@ -167,8 +122,8 @@ type DashboardSnapshot = {
   syncState: StatusTone;
 };
 
-const ADMIN_REFRESH_EVENT = 'sm-dispatch:admin-refresh';
-const WORKSPACE_STORAGE_KEY = 'sm_dispatch_workspace_id';
+const ADMIN_REFRESH_EVENT = 'dispatchiq:admin-refresh';
+const WORKSPACE_STORAGE_KEY = 'dispatchiq_workspace_id';
 
 const CARD_TONE_STYLES: Record<DashboardCardTone, { card: string; icon: string; accent: string; strip: string }> = {
   indigo: {
@@ -285,7 +240,7 @@ const ACTIVITY_ICONS: Record<string, ElementType> = {
 const WORKSPACES = [
   {
     id: 'clientcrew',
-    name: 'Client-Crew Dispatch',
+    name: 'DispatchIQ',
     plan: 'Enterprise Plan',
     region: 'Primary workspace',
   },
@@ -538,101 +493,6 @@ function getActionLabel(status: string): string {
     default:
       return 'Open Job';
   }
-}
-
-function normalizeSource(source?: string | null): string {
-  const value = (source || 'manual').toLowerCase();
-  if (value.includes('web')) return 'Web Form';
-  if (value.includes('phone') || value.includes('sms') || value.includes('call')) return 'Phone';
-  if (value.includes('email')) return 'Email';
-  if (value.includes('api') || value.includes('integration')) return 'API';
-  return 'Manual';
-}
-
-function buildWeeklyTrend(
-  jobs: BackendAdminJob[],
-  reportsToday: BackendReportsOverview,
-  reportsYesterday: BackendReportsOverview | null,
-  now: Date,
-): TrendPoint[] {
-  const latestJobDate = jobs
-    .map((job) => parseDateSafe(job.updated_at || job.created_at))
-    .filter((value): value is Date => Boolean(value))
-    .sort((left, right) => right.getTime() - left.getTime())[0] || now;
-
-  const reference = latestJobDate > now ? latestJobDate : now;
-  const start = startOfDay(subDays(reference, 6));
-  const days = Array.from({ length: 7 }, (_, index) => new Date(start.getTime() + (index * 86400000)));
-
-  const points = days.map((day) => {
-    const created = jobs.filter((job) => isSameDay(parseDateSafe(job.created_at) || now, day)).length;
-    const completed = jobs.filter((job) => (
-      normalizeStatus(job.status) === 'completed'
-      && isSameDay(parseDateSafe(job.updated_at || job.created_at) || now, day)
-    )).length;
-
-    return {
-      day: format(day, 'EEE'),
-      created,
-      completed,
-      date: day,
-    };
-  });
-
-  if (points.every((point) => point.created === 0 && point.completed === 0)) {
-    const baseCreated = Math.max(3, Math.round(reportsToday.kpis.jobs_created / 2) || 3);
-    const baseCompleted = Math.max(2, Math.round(reportsToday.kpis.jobs_completed / 2) || 2);
-    const waveformCreated = [0.78, 0.92, 1.05, 0.98, 1.14, 1.22, 1.08];
-    const waveformCompleted = [0.62, 0.75, 0.88, 0.93, 1.02, 1.08, 1.12];
-    return days.map((day, index) => ({
-      day: format(day, 'EEE'),
-      created: Math.max(1, Math.round(baseCreated * waveformCreated[index])),
-      completed: Math.max(1, Math.round(baseCompleted * waveformCompleted[index])),
-      date: day,
-    }));
-  }
-
-  if (reportsYesterday) {
-    const lastPoint = points[points.length - 1];
-    if (lastPoint.created === 0 && reportsToday.kpis.jobs_created > 0) {
-      lastPoint.created = reportsToday.kpis.jobs_created;
-    }
-    if (lastPoint.completed === 0 && reportsToday.kpis.jobs_completed > 0) {
-      lastPoint.completed = reportsToday.kpis.jobs_completed;
-    }
-  }
-
-  return points;
-}
-
-function buildSourceBreakdown(jobs: BackendAdminJob[]): SourcePoint[] {
-  const counts = new Map<string, number>();
-
-  jobs.forEach((job) => {
-    const source = normalizeSource(job.source_system);
-    counts.set(source, (counts.get(source) || 0) + 1);
-  });
-
-  const entries = Array.from(counts.entries()).map(([name, value]) => ({ name, value }));
-  const total = entries.reduce((sum, entry) => sum + entry.value, 0);
-
-  if (!total) {
-    return [
-      { name: 'Web Form', value: 42, color: '#4F46E5' },
-      { name: 'Phone', value: 24, color: '#0EA5E9' },
-      { name: 'Email', value: 18, color: '#14B8A6' },
-      { name: 'API', value: 16, color: '#8B5CF6' },
-    ];
-  }
-
-  const palette = ['#4F46E5', '#0EA5E9', '#14B8A6', '#8B5CF6', '#F59E0B'];
-  return entries
-    .sort((left, right) => right.value - left.value)
-    .map((entry, index) => ({
-      name: entry.name,
-      value: entry.value,
-      color: palette[index % palette.length],
-    }));
 }
 
 function buildTechnicianStatus(
@@ -1025,8 +885,6 @@ function buildSnapshot(input: {
   const draftInvoices = invoices.filter((invoice) => invoice.status === 'draft').length;
   const liveTechnicians = technicians.filter((technician) => technician.status === 'active').length;
 
-  const weeklyTrend = buildWeeklyTrend(jobs, todayReports, yesterdayReports, now);
-  const sourceBreakdown = buildSourceBreakdown(jobs);
   const urgentJobs = buildUrgentJobs(jobs, invoices, dealershipsById, now);
   const activity = buildActivityFeed(jobs, invoices, dealerships, now);
   const technicianRows = buildTechnicianStatus(technicians, jobs, dealershipsById, now);
@@ -1130,80 +988,11 @@ function buildSnapshot(input: {
     },
   ];
 
-  const healthRows: HealthRow[] = [
-    {
-      id: 'jobs-db',
-      label: 'Jobs in DB',
-      metric: formatNumber(jobs.length),
-      status: jobs.length > 0 ? 'Healthy' : 'Warning',
-      statusTone: jobs.length > 0 ? 'healthy' : 'warning',
-      icon: Database,
-      helperText: 'Persisted dispatch jobs',
-    },
-    {
-      id: 'technicians',
-      label: 'Technicians',
-      metric: formatNumber(technicians.length),
-      status: liveTechnicians > 0 ? 'Healthy' : 'Warning',
-      statusTone: liveTechnicians > 0 ? 'healthy' : 'warning',
-      icon: Users,
-      helperText: `${onlineTechnicians} online right now`,
-    },
-    {
-      id: 'customers',
-      label: 'Customers',
-      metric: formatNumber(dealerships.length),
-      status: dealerships.length > 0 ? 'Healthy' : 'Warning',
-      statusTone: dealerships.length > 0 ? 'healthy' : 'warning',
-      icon: Building2,
-      helperText: 'Service locations and accounts',
-    },
-    {
-      id: 'invoices',
-      label: 'Invoices',
-      metric: formatNumber(invoices.length),
-      status: overdueInvoices > 0 ? 'Warning' : 'Healthy',
-      statusTone: overdueInvoices > 0 ? 'warning' : 'healthy',
-      icon: FileText,
-      helperText: `${draftInvoices} waiting for approval`,
-    },
-    {
-      id: 'backend-sync',
-      label: 'Backend Sync',
-      metric: 'Live',
-      status: 'Live',
-      statusTone: 'live',
-      icon: Activity,
-      helperText: 'Data mirror updated on refresh',
-    },
-    {
-      id: 'queue-health',
-      label: 'Queue Health',
-      metric: `${pendingReviewCount + awaitingAcceptanceCount}`,
-      status: (pendingReviewCount + awaitingAcceptanceCount) > 0 ? 'Warning' : 'Healthy',
-      statusTone: (pendingReviewCount + awaitingAcceptanceCount) > 0 ? 'warning' : 'healthy',
-      icon: Loader2,
-      helperText: 'Review and dispatch backlog',
-    },
-    {
-      id: 'notifications',
-      label: 'Notification Delivery',
-      metric: 'Ready',
-      status: 'Live',
-      statusTone: 'live',
-      icon: Sparkles,
-      helperText: 'Alerts, updates, and reminders',
-    },
-  ];
-
   return {
     cards,
     activity,
     urgentJobs,
     technicians: technicianRows,
-    healthRows,
-    weeklyTrend,
-    sourceBreakdown,
     stats: {
       jobs: jobs.length,
       technicians: technicians.length,
@@ -1312,17 +1101,6 @@ function DashboardChartCard({ title, description, children, action, actionLabel 
         {children}
       </CardContent>
     </Card>
-  );
-}
-
-function ChartFallback({ title, description }: { title: string; description: string }) {
-  return (
-    <div className="flex h-[280px] items-center justify-center px-6 text-center">
-      <div className="max-w-sm space-y-2">
-        <p className="text-base font-semibold text-slate-900">{title}</p>
-        <p className="text-sm text-slate-500">{description}</p>
-      </div>
-    </div>
   );
 }
 
@@ -1458,36 +1236,6 @@ export default function Dashboard() {
   const workspaceDetails = workspace;
   const lastUpdatedLabel = lastUpdated ? formatRelativeTimestamp(lastUpdated, new Date()) : 'Not synced yet';
   const syncTone = snapshot?.syncState === 'warning' ? 'warning' : error ? 'critical' : 'live';
-  const chartConfig: ChartConfig = {
-    created: {
-      label: 'Jobs created',
-      color: 'hsl(226 88% 60%)',
-    },
-    completed: {
-      label: 'Jobs completed',
-      color: 'hsl(156 70% 42%)',
-    },
-    web: {
-      label: 'Web Form',
-      color: 'hsl(226 88% 60%)',
-    },
-    phone: {
-      label: 'Phone',
-      color: 'hsl(199 89% 48%)',
-    },
-    email: {
-      label: 'Email',
-      color: 'hsl(171 66% 40%)',
-    },
-    api: {
-      label: 'API',
-      color: 'hsl(262 83% 58%)',
-    },
-    manual: {
-      label: 'Manual',
-      color: 'hsl(31 92% 50%)',
-    },
-  };
 
   const statusSummary = useMemo(() => snapshot ? [
     { label: 'Live jobs', value: snapshot.stats.jobs, tone: 'blue' as const },
@@ -1512,9 +1260,6 @@ export default function Dashboard() {
       </div>
     );
   }
-
-  const jobsTrendData = snapshot.weeklyTrend;
-  const sourceData = snapshot.sourceBreakdown;
 
   return (
     <div className="mx-auto max-w-[1600px] space-y-6 pb-10">
@@ -1692,97 +1437,6 @@ export default function Dashboard() {
               </div>
             </ScrollArea>
           </DashboardChartCard>
-
-          <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
-            <DashboardChartCard
-              title="Jobs Trend This Week"
-              description="Daily volume of jobs created and completed over the last seven days."
-            >
-              <div className="h-[330px] px-4 pb-4 pt-2">
-                {jobsTrendData.length > 0 ? (
-                    <ChartContainer config={chartConfig} className="h-full w-full aspect-auto">
-                      <LineChart data={jobsTrendData} margin={{ top: 20, right: 20, left: 0, bottom: 0 }}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="#E2E8F0" vertical={false} />
-                      <XAxis
-                        dataKey="day"
-                        tickLine={false}
-                        axisLine={false}
-                        tickMargin={12}
-                        className="text-xs text-slate-500"
-                      />
-                      <YAxis tickLine={false} axisLine={false} width={28} className="text-xs text-slate-500" />
-                      <ChartTooltip content={<ChartTooltipContent indicator="line" />} />
-                      <Line
-                        type="monotone"
-                        dataKey="created"
-                        stroke="var(--color-created)"
-                        strokeWidth={3}
-                        dot={false}
-                        activeDot={{ r: 6 }}
-                      />
-                      <Line
-                        type="monotone"
-                        dataKey="completed"
-                        stroke="var(--color-completed)"
-                        strokeWidth={3}
-                        dot={false}
-                        activeDot={{ r: 6 }}
-                      />
-                      <ChartLegend content={<ChartLegendContent />} />
-                    </LineChart>
-                  </ChartContainer>
-                ) : (
-                  <ChartFallback
-                    title="No weekly trend yet"
-                    description="The chart will light up as soon as the backend returns enough job history."
-                  />
-                )}
-              </div>
-            </DashboardChartCard>
-
-            <DashboardChartCard
-              title="Intake by Source"
-              description="Where new requests are coming from across the CRM."
-            >
-              <div className="h-[330px] px-4 pb-4 pt-2">
-                {sourceData.length > 0 ? (
-                  <ChartContainer config={chartConfig} className="h-full w-full aspect-auto">
-                    <PieChart>
-                      <ChartTooltip content={<ChartTooltipContent indicator="dot" hideLabel />} />
-                      <Pie
-                        data={sourceData}
-                        dataKey="value"
-                        nameKey="name"
-                        innerRadius={72}
-                        outerRadius={112}
-                        paddingAngle={3}
-                        stroke="transparent"
-                      >
-                        {sourceData.map((entry) => (
-                          <Cell key={entry.name} fill={entry.color} />
-                        ))}
-                      </Pie>
-                    </PieChart>
-                  </ChartContainer>
-                ) : (
-                  <ChartFallback
-                    title="No source mix yet"
-                    description="Source distribution will appear once intake channels have enough data."
-                  />
-                )}
-                {sourceData.length > 0 ? (
-                  <div className="mt-4 flex flex-wrap justify-center gap-2 px-4 pb-2">
-                    {sourceData.map((entry) => (
-                      <span key={entry.name} className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-600 shadow-sm">
-                        <span className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: entry.color }} />
-                        {entry.name} {formatNumber(entry.value)}
-                      </span>
-                    ))}
-                  </div>
-                ) : null}
-              </div>
-            </DashboardChartCard>
-          </div>
         </div>
 
         <div className="space-y-6">
@@ -1932,42 +1586,9 @@ export default function Dashboard() {
               })}
             </div>
           </DashboardChartCard>
-
-          <DashboardChartCard
-            title="System Health"
-            description="Operational counters and service health at a glance."
-          >
-            <div className="space-y-3 p-5">
-              {snapshot.healthRows.map((row) => {
-                const style = STATUS_TONE_STYLES[row.statusTone];
-                const Icon = row.icon;
-                return (
-                  <div key={row.id} className="flex items-center justify-between rounded-[18px] border border-slate-200 bg-white px-4 py-3 shadow-sm">
-                    <div className="flex items-center gap-3">
-                      <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-slate-100 text-slate-700">
-                        <Icon className="h-4 w-4" />
-                      </div>
-                      <div>
-                        <p className="text-sm font-semibold text-slate-900">{row.label}</p>
-                        <p className="text-xs text-slate-500">{row.helperText}</p>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <div className="text-right">
-                        <p className="text-base font-semibold text-slate-950">{row.metric}</p>
-                        <p className={cn('text-xs font-medium', style.text)}>{row.status}</p>
-                      </div>
-                      <Badge className={cn('border px-2.5 py-1 text-[11px] font-semibold', style.badge)}>
-                        {row.status}
-                      </Badge>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          </DashboardChartCard>
         </div>
       </div>
     </div>
   );
 }
+

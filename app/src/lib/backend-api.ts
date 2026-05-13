@@ -1,5 +1,5 @@
-const ADMIN_TOKEN_STORAGE_KEY = 'sm_dispatch_admin_access_token';
-const TECHNICIAN_TOKEN_STORAGE_KEY = 'sm_dispatch_technician_access_token';
+const ADMIN_TOKEN_STORAGE_KEY = 'dispatchiq_admin_access_token';
+const TECHNICIAN_TOKEN_STORAGE_KEY = 'dispatchiq_technician_access_token';
 const ENV_API_BASE_URL = (import.meta.env.VITE_BACKEND_URL || '').trim();
 const API_BASE_URL = (
   import.meta.env.DEV
@@ -1456,3 +1456,4 @@ export async function fetchAdminReportsOverview(
   const suffix = search.toString() ? `?${search.toString()}` : '';
   return requestJson<BackendReportsOverview>(`/admin/reports/overview${suffix}`, { token });
 }
+

@@ -54,16 +54,16 @@ class PasswordResetApiTests(unittest.TestCase):
 
             forgot_response = self.client.post(
                 "/auth/forgot-password",
-                json={"email": "admin@sm2dispatch.com"},
+                json={"email": "admin@dispatchiq.test"},
             )
 
         self.assertEqual(forgot_response.status_code, 200, forgot_response.text)
-        self.assertEqual(captured["recipient_email"], "admin@sm2dispatch.com")
+        self.assertEqual(captured["recipient_email"], "admin@dispatchiq.test")
         self.assertEqual(len(captured["otp_code"]), 6)
 
         verify_response = self.client.post(
             "/auth/verify-otp",
-            json={"email": "admin@sm2dispatch.com", "otp": captured["otp_code"]},
+            json={"email": "admin@dispatchiq.test", "otp": captured["otp_code"]},
         )
         self.assertEqual(verify_response.status_code, 200, verify_response.text)
         reset_token = verify_response.json()["reset_token"]
@@ -77,15 +77,15 @@ class PasswordResetApiTests(unittest.TestCase):
 
         login_response = self.client.post(
             "/auth/dev/admin-token",
-            json={"email": "admin@sm2dispatch.com", "password": "resetpass123"},
+            json={"email": "admin@dispatchiq.test", "password": "resetpass123"},
         )
         self.assertEqual(login_response.status_code, 200, login_response.text)
 
     def test_verify_otp_increments_attempts_and_enforces_limit(self):
         with patch("app.services.email_service.EmailService.send_password_reset_otp", return_value=None):
-            self.client.post("/auth/forgot-password", json={"email": "admin@sm2dispatch.com"})
+            self.client.post("/auth/forgot-password", json={"email": "admin@dispatchiq.test"})
 
-        wrong_payload = {"email": "admin@sm2dispatch.com", "otp": "000000"}
+        wrong_payload = {"email": "admin@dispatchiq.test", "otp": "000000"}
         for _ in range(3):
             response = self.client.post("/auth/verify-otp", json=wrong_payload)
             self.assertEqual(response.status_code, 400, response.text)
@@ -96,3 +96,4 @@ class PasswordResetApiTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+

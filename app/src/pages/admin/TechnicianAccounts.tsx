@@ -5,6 +5,7 @@ import {
   UserCog,
   Mail,
   Phone,
+  KeyRound,
   ShieldCheck,
   ShieldOff,
   Calendar,
@@ -41,12 +42,19 @@ import {
 } from '@/components/ui/table';
 import { Label } from '@/components/ui/label';
 import { formatPhoneForDisplay, formatUsPhoneInput } from '@/lib/phone';
+import { getStoredAdminToken, updateAdminPassword } from '@/lib/backend-api';
 
 type EditFormState = {
   name: string;
   email: string;
   phone: string;
   password: string;
+};
+
+type AdminPasswordFormState = {
+  currentPassword: string;
+  newPassword: string;
+  confirmPassword: string;
 };
 
 const formatDateTime = (value: string) => {
@@ -82,6 +90,13 @@ export default function TechnicianAccountsPage() {
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [syncError, setSyncError] = useState<string | null>(null);
   const [lastSyncedAt, setLastSyncedAt] = useState<string | null>(null);
+  const [adminPasswordForm, setAdminPasswordForm] = useState<AdminPasswordFormState>({
+    currentPassword: '',
+    newPassword: '',
+    confirmPassword: '',
+  });
+  const [adminPasswordError, setAdminPasswordError] = useState<string | null>(null);
+  const [isSavingAdminPassword, setIsSavingAdminPassword] = useState(false);
 
   const runSync = useCallback(async () => {
     setIsRefreshing(true);
@@ -109,15 +124,16 @@ export default function TechnicianAccountsPage() {
       void runSync();
     };
 
-    window.addEventListener('sm-dispatch:admin-refresh', handleAdminRefresh);
+    window.addEventListener('dispatchiq:admin-refresh', handleAdminRefresh);
     return () => {
-      window.removeEventListener('sm-dispatch:admin-refresh', handleAdminRefresh);
+      window.removeEventListener('dispatchiq:admin-refresh', handleAdminRefresh);
     };
   }, [runSync]);
 
   const activeCount = technicianAccounts.filter((item) => item.isActive).length;
   const pendingCount = pendingTechnicianRequests.length;
   const hasSearchQuery = searchQuery.trim().length > 0;
+  const syncStatusLabel = isRefreshing ? 'Syncing data...' : syncError ? 'Sync failed' : 'Data synced';
 
   const filteredAccounts = useMemo(() => {
     const query = searchQuery.trim().toLowerCase();
@@ -226,12 +242,59 @@ export default function TechnicianAccountsPage() {
     }
   };
 
+  const handleSaveAdminPassword = async () => {
+    const adminToken = getStoredAdminToken();
+    if (!adminToken) {
+      setAdminPasswordError('Admin session is required to update the admin password.');
+      return;
+    }
+
+    const currentPassword = adminPasswordForm.currentPassword.trim();
+    const newPassword = adminPasswordForm.newPassword.trim();
+    const confirmPassword = adminPasswordForm.confirmPassword.trim();
+
+    if (!currentPassword || !newPassword || !confirmPassword) {
+      setAdminPasswordError('All password fields are required.');
+      return;
+    }
+    if (newPassword.length < 6) {
+      setAdminPasswordError('New password must be at least 6 characters.');
+      return;
+    }
+    if (newPassword !== confirmPassword) {
+      setAdminPasswordError('New password and confirmation do not match.');
+      return;
+    }
+
+    setIsSavingAdminPassword(true);
+    setAdminPasswordError(null);
+
+    try {
+      await updateAdminPassword(adminToken, {
+        current_password: currentPassword,
+        new_password: newPassword,
+      });
+      setAdminPasswordForm({
+        currentPassword: '',
+        newPassword: '',
+        confirmPassword: '',
+      });
+      window.alert('Admin password updated successfully.');
+    } catch (error) {
+      setAdminPasswordError(error instanceof Error ? error.message : 'Unable to update admin password.');
+    } finally {
+      setIsSavingAdminPassword(false);
+    }
+  };
+
   return (
     <div className="space-y-6">
-      <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Technician Accounts</h1>
-          <p className="text-sm text-gray-500 font-medium">Admin-only account management for technician sign-in access.</p>
+          <p className="text-sm text-gray-500 font-medium">
+            Admin-only account management for technician sign-in access and admin password changes.
+          </p>
         </div>
 
         <div className="flex flex-col gap-3 md:items-end">
@@ -243,34 +306,34 @@ export default function TechnicianAccountsPage() {
             disabled={isRefreshing}
             className="h-9 gap-2 self-start md:self-auto"
           >
-            <RefreshCw className="w-4 h-4" />
+            <RefreshCw className={isRefreshing ? 'w-4 h-4 animate-spin' : 'w-4 h-4'} />
             Refresh
           </Button>
-          <div className="grid grid-cols-3 gap-3 md:w-[520px]">
-            <Card className="p-3 border-gray-200">
-              <p className="text-xs uppercase tracking-wide text-gray-500">Total Accounts</p>
-              <p className="text-xl font-bold text-gray-900">{technicianAccounts.length}</p>
+          <div className="grid grid-cols-3 gap-3 md:w-[620px]">
+            <Card className="border-border/60 bg-card/80 p-3 shadow-sm backdrop-blur">
+              <p className="text-[11px] uppercase tracking-[0.18em] text-muted-foreground">Total Accounts</p>
+              <p className="mt-2 text-xl font-bold text-foreground">{technicianAccounts.length}</p>
             </Card>
-            <Card className="p-3 border-gray-200">
-              <p className="text-xs uppercase tracking-wide text-gray-500">Active</p>
-              <p className="text-xl font-bold text-emerald-700">{activeCount}</p>
+            <Card className="border-border/60 bg-card/80 p-3 shadow-sm backdrop-blur">
+              <p className="text-[11px] uppercase tracking-[0.18em] text-muted-foreground">Active</p>
+              <p className="mt-2 text-xl font-bold text-emerald-700">{activeCount}</p>
             </Card>
-            <Card className="p-3 border-gray-200">
-              <p className="text-xs uppercase tracking-wide text-gray-500">Pending Requests</p>
-              <p className="text-xl font-bold text-amber-700">{pendingCount}</p>
+            <Card className="border-border/60 bg-card/80 p-3 shadow-sm backdrop-blur">
+              <p className="text-[11px] uppercase tracking-[0.18em] text-muted-foreground">Pending Requests</p>
+              <p className="mt-2 text-xl font-bold text-amber-700">{pendingCount}</p>
             </Card>
           </div>
         </div>
       </div>
 
-      <Card className="p-4 border-gray-200">
+      <Card className="border-border/60 bg-card/80 p-4 shadow-sm backdrop-blur">
         <div className="relative max-w-md">
-          <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+          <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
           <Input
             placeholder="Search by name, email, or phone"
             value={searchQuery}
             onChange={(event) => setSearchQuery(event.target.value)}
-            className="pl-9"
+            className="h-10 pl-9"
           />
         </div>
         <div className="mt-3 flex flex-wrap items-center gap-2">
@@ -290,7 +353,7 @@ export default function TechnicianAccountsPage() {
             Showing {filteredAccounts.length} accounts • {filteredPendingRequests.length} pending
           </Badge>
           {lastSyncedAt ? (
-            <span className="text-xs text-gray-500">Last synced at {lastSyncedAt}</span>
+            <span className="text-xs text-muted-foreground">Last synced at {lastSyncedAt}</span>
           ) : null}
           {hasSearchQuery ? (
             <Button
@@ -298,9 +361,9 @@ export default function TechnicianAccountsPage() {
               variant="ghost"
               size="sm"
               onClick={() => setSearchQuery('')}
-              className="h-7 px-2 text-gray-600"
+              className="h-7 px-2 text-muted-foreground"
             >
-              Clear Search
+              Clear search
             </Button>
           ) : null}
           {syncError ? (
@@ -321,8 +384,88 @@ export default function TechnicianAccountsPage() {
         </div>
       </Card>
 
-      <Card className="border-gray-200">
-        <div className="px-6 py-4 border-b border-gray-100 bg-amber-50/40">
+      <Card className="border-border/60 bg-card/80 shadow-sm backdrop-blur">
+        <div className="px-6 py-4 border-b border-border/60 bg-muted/30">
+          <h2 className="text-base font-semibold text-gray-900 flex items-center gap-2">
+            <KeyRound className="w-4 h-4 text-slate-700" />
+            Admin Password
+          </h2>
+          <p className="text-sm text-gray-600 mt-1">
+            Change the admin sign-in password from the Tech Accounts page.
+          </p>
+        </div>
+        <div className="grid gap-4 px-6 py-5 md:grid-cols-3">
+          <div className="space-y-2">
+            <Label htmlFor="admin-current-password">Current Password</Label>
+            <Input
+              id="admin-current-password"
+              type="password"
+              autoComplete="current-password"
+              value={adminPasswordForm.currentPassword}
+              onChange={(event) => setAdminPasswordForm((prev) => ({ ...prev, currentPassword: event.target.value }))}
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="admin-new-password">New Password</Label>
+            <Input
+              id="admin-new-password"
+              type="password"
+              autoComplete="new-password"
+              value={adminPasswordForm.newPassword}
+              onChange={(event) => setAdminPasswordForm((prev) => ({ ...prev, newPassword: event.target.value }))}
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="admin-confirm-password">Confirm Password</Label>
+            <Input
+              id="admin-confirm-password"
+              type="password"
+              autoComplete="new-password"
+              value={adminPasswordForm.confirmPassword}
+              onChange={(event) => setAdminPasswordForm((prev) => ({ ...prev, confirmPassword: event.target.value }))}
+            />
+          </div>
+        </div>
+        <div className="px-6 pb-4">
+          <p className="text-xs text-gray-500">
+            This updates the password used for the admin login at `/admin/login`.
+          </p>
+          {adminPasswordError ? (
+            <p className="mt-2 text-sm text-red-600">{adminPasswordError}</p>
+          ) : null}
+        </div>
+        <div className="flex flex-wrap items-center justify-end gap-2 border-t border-border/60 bg-background/40 px-6 py-4">
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => {
+              setAdminPasswordForm({
+                currentPassword: '',
+                newPassword: '',
+                confirmPassword: '',
+              });
+              setAdminPasswordError(null);
+            }}
+            disabled={isSavingAdminPassword}
+          >
+            Clear
+          </Button>
+          <Button
+            type="button"
+            onClick={() => void handleSaveAdminPassword()}
+            disabled={isSavingAdminPassword}
+            className="bg-[#2F8E92] hover:bg-[#27797d]"
+          >
+            <KeyRound className="w-4 h-4 mr-1" />
+            {isSavingAdminPassword ? 'Updating...' : 'Update Admin Password'}
+          </Button>
+        </div>
+      </Card>
+
+      <Card className="border-border/60 bg-card/80 shadow-sm backdrop-blur">
+        <div className="px-6 py-4 border-b border-border/60 bg-amber-50/40">
           <h2 className="text-base font-semibold text-gray-900 flex items-center gap-2">
             <UserPlus className="w-4 h-4 text-amber-600" />
             Pending Signup Requests
@@ -334,8 +477,8 @@ export default function TechnicianAccountsPage() {
             Approve requests to create technician accounts and allow login.
           </p>
         </div>
-        <Table>
-          <TableHeader className="bg-gray-50">
+        <Table className="table-fixed">
+          <TableHeader className="bg-muted/30 backdrop-blur">
             <TableRow>
               <TableHead className="pl-6 w-[220px]">Technician</TableHead>
               <TableHead className="w-[260px]">Contact</TableHead>
@@ -352,7 +495,7 @@ export default function TechnicianAccountsPage() {
               </TableRow>
             ) : (
               filteredPendingRequests.map((request) => (
-                <TableRow key={request.id} className="hover:bg-[#fffdf7]">
+                <TableRow key={request.id} className="hover:bg-muted/20">
                   <TableCell className="pl-6">
                     <div className="flex items-center gap-3">
                       <div className="w-9 h-9 rounded-full bg-amber-100 text-amber-700 flex items-center justify-center">
@@ -411,8 +554,8 @@ export default function TechnicianAccountsPage() {
         </Table>
       </Card>
 
-      <Card className="border-gray-200">
-        <div className="px-6 py-4 border-b border-gray-100 bg-[#f6fbfb]">
+      <Card className="border-border/60 bg-card/80 shadow-sm backdrop-blur">
+        <div className="px-6 py-4 border-b border-border/60 bg-[#f6fbfb]">
           <h2 className="text-base font-semibold text-gray-900 flex items-center gap-2">
             <UserCog className="w-4 h-4 text-[#2F8E92]" />
             Active Technician Accounts
@@ -421,8 +564,8 @@ export default function TechnicianAccountsPage() {
             </Badge>
           </h2>
         </div>
-        <Table>
-          <TableHeader className="bg-gray-50">
+        <Table className="table-fixed">
+          <TableHeader className="bg-muted/30 backdrop-blur">
             <TableRow>
               <TableHead className="pl-6 w-[220px]">Account</TableHead>
               <TableHead className="w-[260px]">Contact</TableHead>
@@ -440,7 +583,7 @@ export default function TechnicianAccountsPage() {
               </TableRow>
             ) : (
               filteredAccounts.map((account) => (
-                <TableRow key={account.id} className="hover:bg-[#f9fbfb]">
+                <TableRow key={account.id} className="hover:bg-muted/20">
                   <TableCell className="pl-6">
                     <div className="flex items-center gap-3">
                       <div className="w-9 h-9 rounded-full bg-[#e8f4f5] text-[#2F8E92] flex items-center justify-center">
@@ -566,3 +709,4 @@ export default function TechnicianAccountsPage() {
     </div>
   );
 }
+

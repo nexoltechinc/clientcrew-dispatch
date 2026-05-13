@@ -77,8 +77,8 @@ class TechnicianJobLifecycleApiTests(unittest.TestCase):
         return {"Authorization": f"Bearer {token_res.json()['access_token']}"}
 
     def test_accept_pending_job_moves_to_scheduled(self):
-        tech = self._seed_technician(name="Tech A", email="techa@sm2dispatch.com")
-        job = self._seed_job(code="SM2-ACCEPT-1", status="pending", technician_id=tech.id)
+        tech = self._seed_technician(name="Tech A", email="techa@dispatchiq.test")
+        job = self._seed_job(code="DIQ-ACCEPT-1", status="pending", technician_id=tech.id)
         tech_auth = self._technician_auth_header(email=tech.email)
 
         res = self.client.post(f"/technicians/me/jobs/{job.id}/accept", headers=tech_auth)
@@ -92,8 +92,8 @@ class TechnicianJobLifecycleApiTests(unittest.TestCase):
             self.assertEqual(refreshed.assigned_tech_id, tech.id)
 
     def test_refuse_pending_job_unassigns_and_keeps_pending(self):
-        tech = self._seed_technician(name="Tech B", email="techb@sm2dispatch.com")
-        job = self._seed_job(code="SM2-REFUSE-1", status="pending", technician_id=tech.id)
+        tech = self._seed_technician(name="Tech B", email="techb@dispatchiq.test")
+        job = self._seed_job(code="DIQ-REFUSE-1", status="pending", technician_id=tech.id)
         tech_auth = self._technician_auth_header(email=tech.email)
 
         res = self.client.post(
@@ -113,3 +113,4 @@ class TechnicianJobLifecycleApiTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+

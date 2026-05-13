@@ -21,6 +21,7 @@ import ServicesPage from '@/pages/admin/Services';
 import ReportsPage from '@/pages/admin/Reports';
 import SettingsPage from '@/pages/admin/Settings';
 import InvoiceHistoryPage from '@/pages/admin/InvoiceHistory';
+import AuditLogsPage from '@/pages/admin/AuditLogs';
 
 // Admin Preview Mode
 import TechnicianPreview from '@/pages/admin/TechnicianPreview';
@@ -150,6 +151,7 @@ function App() {
                     <Route path="dealerships" element={<DealershipsPage />} />
                     <Route path="services" element={<ServicesPage />} />
                     <Route path="reports" element={<ReportsPage />} />
+                    <Route path="audit-logs" element={<AuditLogsPage />} />
                     <Route path="settings" element={<SettingsPage />} />
                   </Routes>
                 </AdminLayout>

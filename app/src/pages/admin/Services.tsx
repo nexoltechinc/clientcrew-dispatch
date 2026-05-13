@@ -109,7 +109,7 @@ const mapBackendServiceToUi = (row: BackendServiceCatalogItem): ServiceItem => (
     allowed_actions: ['edit', row.status === 'active' ? 'archive' : 'unarchive', 'duplicate'],
 });
 
-const ADMIN_REFRESH_EVENT = 'sm-dispatch:admin-refresh';
+const ADMIN_REFRESH_EVENT = 'dispatchiq:admin-refresh';
 
 // --- Mock Data ---
 
@@ -748,4 +748,5 @@ export default function ServicesPage() {
         </div>
     );
 }
+
 

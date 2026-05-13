@@ -1,4 +1,4 @@
-// SM2 Dispatch - Type Definitions
+// DispatchIQ - Type Definitions
 
 // User Roles
 export type UserRole = 'admin' | 'technician';
@@ -323,3 +323,4 @@ export interface DelayReason {
 export interface RefuseReason {
   reason: string;
 }
+

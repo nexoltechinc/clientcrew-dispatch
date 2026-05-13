@@ -135,7 +135,7 @@ interface JobDetail {
 
 const MOCK_JOB: JobDetail = {
     job_id: 'job-123',
-    job_code: 'SM2-2024-1021',
+    job_code: 'DIQ-2024-1021',
     status: 'pending',
     invoice_state: 'pending_approval',
     urgency: 'high',
@@ -143,7 +143,7 @@ const MOCK_JOB: JobDetail = {
     updated_at: '2024-03-20T10:30:00Z',
 
     dealership: {
-        name: 'Audi de Quebec',
+        name: 'Northwind Auto',
         contact_phone: '(555) 123-4567',
         service_type: 'Key Programming',
         service_names: ['Key Programming'],
@@ -179,9 +179,9 @@ const MOCK_JOB: JobDetail = {
 };
 
 const ELIGIBLE_TECHS: Technician[] = [
-    { id: 't1', name: 'Jolianne', zone: 'North', skillMatch: true, status: 'available', workload: 20 },
-    { id: 't2', name: 'Victor', zone: 'North', skillMatch: true, status: 'busy', workload: 80 },
-    { id: 't3', name: 'Maxime', zone: 'East', skillMatch: false, status: 'available', workload: 10 },
+    { id: 't1', name: 'Taylor Brooks', zone: 'North', skillMatch: true, status: 'available', workload: 20 },
+    { id: 't2', name: 'Jordan Lee', zone: 'North', skillMatch: true, status: 'busy', workload: 80 },
+    { id: 't3', name: 'Casey Patel', zone: 'East', skillMatch: false, status: 'available', workload: 10 },
 ];
 
 function normalizeJobStatus(status?: string | null): JobStatus {
@@ -556,10 +556,10 @@ export default function JobDetailPage() {
         setJob((prev) => prev ? ({
             ...prev,
             status: 'scheduled',
-            assigned_technician_name: 'Jolianne',
-            technician: { id: techId, name: 'Jolianne', phone: '+1(555) 999-8888', status: 'assigned' },
+            assigned_technician_name: 'Taylor Brooks',
+            technician: { id: techId, name: 'Taylor Brooks', phone: '+1(555) 999-8888', status: 'assigned' },
             timeline: [
-                { id: Date.now().toString(), type: 'TECH_ASSIGNED', title: 'Technician Assigned', actor: 'ADMIN', timestamp: 'Just now', description: 'Assigned Jolianne to job.' },
+                { id: Date.now().toString(), type: 'TECH_ASSIGNED', title: 'Technician Assigned', actor: 'ADMIN', timestamp: 'Just now', description: 'Assigned Taylor Brooks to job.' },
                 ...prev.timeline
             ]
         }) : null);
@@ -1059,3 +1059,4 @@ export default function JobDetailPage() {
         </div>
     );
 }
+

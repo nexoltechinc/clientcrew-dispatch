@@ -1,4 +1,4 @@
-﻿# SM2 Dispatch - Technician Module (FastAPI)
+# DispatchIQ - Technician Module (FastAPI)
 
 ## Stack
 - **Framework**: FastAPI
@@ -134,3 +134,4 @@ Successful status response should show:
 
 ### Remaining Improvement
 - Automatic refresh-token rotation is not implemented yet
+

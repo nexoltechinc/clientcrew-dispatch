@@ -85,15 +85,15 @@ class PreAssignmentServiceTests(unittest.TestCase):
     def test_pre_assign_selects_eligible_and_writes_event(self):
         with SessionLocal() as db:
             skill, zone = self._create_skill_zone(db)
-            tech_selected = self._create_tech(db, name="Dany", email="dany@example.com", priority_rank=20)
-            tech_overlap = self._create_tech(db, name="Maxime", email="maxime@example.com", priority_rank=1)
+            tech_selected = self._create_tech(db, name="Riley Carter", email="dany@example.com", priority_rank=20)
+            tech_overlap = self._create_tech(db, name="Casey Patel", email="maxime@example.com", priority_rank=1)
             self._link_skill_zone(db, tech_selected.id, skill.id, zone.id)
             self._link_skill_zone(db, tech_overlap.id, skill.id, zone.id)
             self._enable_working_day(db, tech_selected.id, day_of_week=2, start_at=time(8, 0))
             self._enable_working_day(db, tech_overlap.id, day_of_week=2, start_at=time(8, 0))
 
             target_job = Job(
-                job_code="SM2-PRE-001",
+                job_code="DIQ-PRE-001",
                 status=PreAssignmentService.READY_FOR_TECH,
                 skill_id=skill.id,
                 zone_id=zone.id,
@@ -104,7 +104,7 @@ class PreAssignmentServiceTests(unittest.TestCase):
             db.flush()
             db.add(
                 Job(
-                    job_code="SM2-BLOCK-001",
+                    job_code="DIQ-BLOCK-001",
                     status="scheduled",
                     assigned_tech_id=tech_overlap.id,
                     skill_id=skill.id,
@@ -130,7 +130,7 @@ class PreAssignmentServiceTests(unittest.TestCase):
         with SessionLocal() as db:
             skill, zone = self._create_skill_zone(db)
             target_job = Job(
-                job_code="SM2-PRE-002",
+                job_code="DIQ-PRE-002",
                 status=PreAssignmentService.READY_FOR_TECH,
                 skill_id=skill.id,
                 zone_id=zone.id,
@@ -152,11 +152,11 @@ class PreAssignmentServiceTests(unittest.TestCase):
     def test_pre_assign_is_idempotent(self):
         with SessionLocal() as db:
             skill, zone = self._create_skill_zone(db)
-            tech = self._create_tech(db, name="Victor", email="victor@example.com", priority_rank=10)
+            tech = self._create_tech(db, name="Jordan Lee", email="victor@example.com", priority_rank=10)
             self._link_skill_zone(db, tech.id, skill.id, zone.id)
             self._enable_working_day(db, tech.id, day_of_week=3, start_at=time(8, 0))
             target_job = Job(
-                job_code="SM2-PRE-003",
+                job_code="DIQ-PRE-003",
                 status=PreAssignmentService.READY_FOR_TECH,
                 skill_id=skill.id,
                 zone_id=zone.id,
@@ -177,14 +177,14 @@ class PreAssignmentServiceTests(unittest.TestCase):
     def test_pre_assign_honors_exclusive_technician(self):
         with SessionLocal() as db:
             skill, zone = self._create_skill_zone(db)
-            tech_a = self._create_tech(db, name="Jolianne", email="jolianne@example.com", priority_rank=1)
-            tech_b = self._create_tech(db, name="Dany", email="dany2@example.com", priority_rank=100)
+            tech_a = self._create_tech(db, name="Taylor Brooks", email="jolianne@example.com", priority_rank=1)
+            tech_b = self._create_tech(db, name="Riley Carter", email="dany2@example.com", priority_rank=100)
             self._link_skill_zone(db, tech_a.id, skill.id, zone.id)
             self._link_skill_zone(db, tech_b.id, skill.id, zone.id)
             self._enable_working_day(db, tech_a.id, day_of_week=4, start_at=time(8, 0))
             self._enable_working_day(db, tech_b.id, day_of_week=4, start_at=time(8, 0))
             target_job = Job(
-                job_code="SM2-PRE-004",
+                job_code="DIQ-PRE-004",
                 status=PreAssignmentService.READY_FOR_TECH,
                 skill_id=skill.id,
                 zone_id=zone.id,
@@ -203,3 +203,4 @@ class PreAssignmentServiceTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+

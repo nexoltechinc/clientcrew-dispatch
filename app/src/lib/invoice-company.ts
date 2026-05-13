@@ -10,17 +10,17 @@ export interface InvoiceCompanyProfile {
   website: string;
 }
 
-export const INVOICE_COMPANY_PROFILE_STORAGE_KEY = 'sm_dispatch_invoice_company_profile';
+export const INVOICE_COMPANY_PROFILE_STORAGE_KEY = 'dispatchiq_invoice_company_profile';
 
 export const DEFAULT_INVOICE_COMPANY_PROFILE: InvoiceCompanyProfile = {
-  name: 'Client-Crew Dispatch',
+  name: 'DispatchIQ',
   street_address: '123 Service Lane',
   city: 'New York',
   state: 'NY',
   zip_code: '10001',
   phone: '+1-555-010-1000',
-  email: 'billing@clientcrew-dispatch.com',
-  website: 'https://clientcrew-dispatch.vercel.app',
+  email: 'billing@dispatchiq.test',
+  website: 'https://dispatchiq.test',
 };
 
 const readString = (value: unknown): string | undefined => {
@@ -57,3 +57,4 @@ export const saveInvoiceCompanyProfile = (profile: InvoiceCompanyProfile): void 
   if (typeof window === 'undefined') return;
   window.localStorage.setItem(INVOICE_COMPANY_PROFILE_STORAGE_KEY, JSON.stringify(profile));
 };
+

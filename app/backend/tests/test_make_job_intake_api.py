@@ -24,7 +24,7 @@ from app.models.zone import Zone, technician_zones
 
 
 class MakeJobIntakeApiTests(unittest.TestCase):
-    ADMIN_TOKEN_PAYLOAD = {"email": "admin@sm2dispatch.com", "password": "admin123"}
+    ADMIN_TOKEN_PAYLOAD = {"email": "admin@dispatchiq.test", "password": "admin123"}
 
     @classmethod
     def setUpClass(cls):
@@ -47,7 +47,7 @@ class MakeJobIntakeApiTests(unittest.TestCase):
     def _make_payload(self, *, time_value: str = "09:30") -> list[dict]:
         return [
             {
-                "job_id": "SM2-20231201-1234",
+                "job_id": "DIQ-20231201-1234",
                 "dealership": {
                     "dealership_name": "Audi levis",
                     "Téléphone": "+13438421791",
@@ -72,14 +72,14 @@ class MakeJobIntakeApiTests(unittest.TestCase):
         self.assertEqual(body["total"], 1)
         self.assertEqual(body["created"], 1)
         self.assertEqual(body["updated"], 0)
-        self.assertEqual(body["items"][0]["job_code"], "SM2-20231201-1234")
+        self.assertEqual(body["items"][0]["job_code"], "DIQ-20231201-1234")
         self.assertEqual(body["items"][0]["status"], "admin_review")
         self.assertEqual(body["items"][0]["action"], "created")
         self.assertEqual(body["items"][0]["requested_service_date"], "2026-01-15")
         self.assertEqual(body["items"][0]["requested_service_time"], "09:30:00")
 
         with SessionLocal() as db:
-            job = db.query(Job).filter(Job.job_code == "SM2-20231201-1234").first()
+            job = db.query(Job).filter(Job.job_code == "DIQ-20231201-1234").first()
             self.assertIsNotNone(job)
             self.assertEqual(job.status, "admin_review")
             self.assertEqual(job.vehicle, "audi a3 2026")
@@ -104,7 +104,7 @@ class MakeJobIntakeApiTests(unittest.TestCase):
         self.assertEqual(create_res.status_code, 201, create_res.text)
 
         with SessionLocal() as db:
-            job = db.query(Job).filter(Job.job_code == "SM2-20231201-1234").first()
+            job = db.query(Job).filter(Job.job_code == "DIQ-20231201-1234").first()
             self.assertIsNotNone(job)
             job.status = "scheduled"
             db.commit()
@@ -120,17 +120,17 @@ class MakeJobIntakeApiTests(unittest.TestCase):
         self.assertEqual(body["updated"], 0)
         self.assertEqual(body["items"][0]["action"], "created")
         self.assertEqual(body["items"][0]["status"], "admin_review")
-        self.assertEqual(body["items"][0]["job_code"], "SM2-20231201-1234-0001")
+        self.assertEqual(body["items"][0]["job_code"], "DIQ-20231201-1234-0001")
         self.assertEqual(body["items"][0]["requested_service_time"], "10:45:00")
 
         with SessionLocal() as db:
-            original_job = db.query(Job).filter(Job.job_code == "SM2-20231201-1234").first()
+            original_job = db.query(Job).filter(Job.job_code == "DIQ-20231201-1234").first()
             self.assertIsNotNone(original_job)
             self.assertEqual(original_job.status, "scheduled")
             self.assertEqual(original_job.vehicle, "audi a3 2026")
             self.assertEqual(original_job.requested_service_time, time(9, 30))
 
-            new_job = db.query(Job).filter(Job.job_code == "SM2-20231201-1234-0001").first()
+            new_job = db.query(Job).filter(Job.job_code == "DIQ-20231201-1234-0001").first()
             self.assertIsNotNone(new_job)
             self.assertEqual(new_job.status, "admin_review")
             self.assertEqual(new_job.vehicle, "audi a3 2026 updated")
@@ -152,7 +152,7 @@ class MakeJobIntakeApiTests(unittest.TestCase):
         self.assertEqual(list_res.status_code, 200, list_res.text)
         jobs = list_res.json()
         self.assertEqual(len(jobs), 1)
-        self.assertEqual(jobs[0]["job_code"], "SM2-20231201-1234")
+        self.assertEqual(jobs[0]["job_code"], "DIQ-20231201-1234")
         self.assertEqual(jobs[0]["status"], "ADMIN_PREVIEW")
         job_id = jobs[0]["id"]
 
@@ -173,7 +173,7 @@ class MakeJobIntakeApiTests(unittest.TestCase):
         auth_header = {"Authorization": f"Bearer {token_response.json()['access_token']}"}
 
         with SessionLocal() as db:
-            tech = Technician(name="Dany", email="dany@example.com", status="active")
+            tech = Technician(name="Riley Carter", email="dany@example.com", status="active")
             db.add(tech)
             db.commit()
             db.refresh(tech)
@@ -192,10 +192,10 @@ class MakeJobIntakeApiTests(unittest.TestCase):
         )
         self.assertEqual(assign_res.status_code, 200, assign_res.text)
         self.assertEqual(assign_res.json()["assigned_technician_id"], tech_id)
-        self.assertEqual(assign_res.json()["assigned_technician_name"], "Dany")
+        self.assertEqual(assign_res.json()["assigned_technician_name"], "Riley Carter")
 
         with SessionLocal() as db:
-            job = db.query(Job).filter(Job.job_code == "SM2-20231201-1234").first()
+            job = db.query(Job).filter(Job.job_code == "DIQ-20231201-1234").first()
             self.assertIsNotNone(job)
             self.assertEqual(str(job.assigned_tech_id), tech_id)
 
@@ -242,7 +242,7 @@ class MakeJobIntakeApiTests(unittest.TestCase):
         self.assertEqual(create_res.status_code, 201, create_res.text)
 
         with SessionLocal() as db:
-            tech = Technician(name="Dany", email="dany-feed@example.com", status="active", password="tech123")
+            tech = Technician(name="Riley Carter", email="dany-feed@example.com", status="active", password="tech123")
             db.add(tech)
             db.commit()
             db.refresh(tech)
@@ -306,7 +306,7 @@ class MakeJobIntakeApiTests(unittest.TestCase):
             db.refresh(tech)
             tech_id = str(tech.id)
 
-            job = db.query(Job).filter(Job.job_code == "SM2-20231201-1234").first()
+            job = db.query(Job).filter(Job.job_code == "DIQ-20231201-1234").first()
             self.assertIsNotNone(job)
             job.pre_assigned_technician_id = tech.id
             db.commit()
@@ -361,7 +361,7 @@ class MakeJobIntakeApiTests(unittest.TestCase):
         self.assertEqual(second_confirm_res.json()["assigned_technician_id"], tech_id)
 
         with SessionLocal() as db:
-            row = db.query(Job).filter(Job.job_code == "SM2-20231201-1234").first()
+            row = db.query(Job).filter(Job.job_code == "DIQ-20231201-1234").first()
             self.assertIsNotNone(row)
             self.assertEqual(str(row.assigned_tech_id), tech_id)
             self.assertEqual(row.status, "scheduled")
@@ -457,7 +457,7 @@ class MakeJobIntakeApiTests(unittest.TestCase):
         self.assertEqual(create_res.status_code, 201, create_res.text)
 
         with SessionLocal() as db:
-            tech = Technician(name="Victor", email="victor-flow@example.com", status="active", password="tech123")
+            tech = Technician(name="Jordan Lee", email="victor-flow@example.com", status="active", password="tech123")
             db.add(tech)
             db.commit()
             db.refresh(tech)
@@ -507,7 +507,7 @@ class MakeJobIntakeApiTests(unittest.TestCase):
         self.assertEqual(create_res.status_code, 201, create_res.text)
 
         with SessionLocal() as db:
-            tech = Technician(name="Maxime", email="maxime-flow@example.com", status="active", password="tech123")
+            tech = Technician(name="Casey Patel", email="maxime-flow@example.com", status="active", password="tech123")
             db.add(tech)
             db.commit()
             db.refresh(tech)
@@ -566,7 +566,7 @@ class MakeJobIntakeApiTests(unittest.TestCase):
             db.add(tech)
             db.flush()
             job = Job(
-                job_code="SM2-UNKNOWN-0001",
+                job_code="DIQ-UNKNOWN-0001",
                 status="mystery_state",
                 assigned_tech_id=tech.id,
             )
@@ -584,7 +584,7 @@ class MakeJobIntakeApiTests(unittest.TestCase):
         self.assertEqual(feed_res.status_code, 200, feed_res.text)
         body = feed_res.json()
         self.assertEqual(len(body["my_jobs"]), 1)
-        self.assertEqual(body["my_jobs"][0]["job_code"], "SM2-UNKNOWN-0001")
+        self.assertEqual(body["my_jobs"][0]["job_code"], "DIQ-UNKNOWN-0001")
         self.assertEqual(body["my_jobs"][0]["status"], "UNKNOWN")
 
     def test_technician_feed_uses_canonical_status_only(self):
@@ -592,11 +592,11 @@ class MakeJobIntakeApiTests(unittest.TestCase):
             tech = Technician(name="Canonical Tech", email="canonical-tech@example.com", status="active", password="tech123")
             db.add(tech)
             db.flush()
-            db.add(Job(job_code="SM2-CANON-0001", status="scheduled", assigned_tech_id=tech.id))
-            db.add(Job(job_code="SM2-CANON-0002", status="IN_PROGRESS", assigned_tech_id=tech.id))
-            db.add(Job(job_code="SM2-CANON-0003", status="completed", assigned_tech_id=tech.id))
-            db.add(Job(job_code="SM2-CANON-0004", status="pending_admin_confirmation", assigned_tech_id=tech.id))
-            db.add(Job(job_code="SM2-CANON-0005", status="admin_review", assigned_tech_id=tech.id))
+            db.add(Job(job_code="DIQ-CANON-0001", status="scheduled", assigned_tech_id=tech.id))
+            db.add(Job(job_code="DIQ-CANON-0002", status="IN_PROGRESS", assigned_tech_id=tech.id))
+            db.add(Job(job_code="DIQ-CANON-0003", status="completed", assigned_tech_id=tech.id))
+            db.add(Job(job_code="DIQ-CANON-0004", status="pending_admin_confirmation", assigned_tech_id=tech.id))
+            db.add(Job(job_code="DIQ-CANON-0005", status="admin_review", assigned_tech_id=tech.id))
             db.commit()
 
         tech_token_res = self.client.post(
@@ -642,7 +642,7 @@ class MakeJobIntakeApiTests(unittest.TestCase):
 
             db.add(
                 Job(
-                    job_code="SM2-ZONE-FALLBACK-0001",
+                    job_code="DIQ-ZONE-FALLBACK-0001",
                     status="scheduled",
                     assigned_tech_id=tech.id,
                     dealership_id=dealership.id,
@@ -709,7 +709,7 @@ class MakeJobIntakeApiTests(unittest.TestCase):
 
             db.add(
                 Job(
-                    job_code="SM2-ZONE-INFER-0001",
+                    job_code="DIQ-ZONE-INFER-0001",
                     status="scheduled",
                     assigned_tech_id=tech.id,
                     dealership_id=dealership.id,
@@ -757,9 +757,9 @@ class MakeJobIntakeApiTests(unittest.TestCase):
 
         payload = [
             {
-                "job_id": "SM2-20259999-0001",
+                "job_id": "DIQ-20259999-0001",
                 "dealership": {
-                    "dealership_name": "Audi De Quebec",
+                    "dealership_name": "Northwind Auto",
                     "service": "PPF",
                 },
                 "vehicle": "audi a1 2023",
@@ -784,7 +784,7 @@ class MakeJobIntakeApiTests(unittest.TestCase):
 
         jobs_res = self.client.get("/admin/jobs", headers=auth_header)
         self.assertEqual(jobs_res.status_code, 200, jobs_res.text)
-        job = next((row for row in jobs_res.json() if row["job_code"] == "SM2-20259999-0001"), None)
+        job = next((row for row in jobs_res.json() if row["job_code"] == "DIQ-20259999-0001"), None)
         self.assertIsNotNone(job)
         self.assertEqual(job["status"], "ADMIN_PREVIEW")
         self.assertIsNone(job["assigned_technician_id"])
@@ -793,3 +793,4 @@ class MakeJobIntakeApiTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
