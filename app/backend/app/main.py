@@ -8,6 +8,7 @@ from .api import deps
 from .api import rest_v1
 from .api.endpoints import (
     admin_calendar,
+    admin_customer_conversations,
     admin_jobs,
     admin_dealerships,
     admin_email_change_requests,
@@ -16,6 +17,7 @@ from .api.endpoints import (
     admin_settings,
     admin_technicians,
     auth,
+    customer_portal,
     integrations_make_jobs,
     invoices,
     signup_requests,
@@ -87,12 +89,14 @@ app.add_middleware(
 app.include_router(admin_technicians.router)
 app.include_router(admin_jobs.router)
 app.include_router(admin_calendar.router)
+app.include_router(admin_customer_conversations.router)
 app.include_router(admin_dealerships.router)
 app.include_router(admin_email_change_requests.router)
 app.include_router(admin_reports.router)
 app.include_router(admin_services.router)
 app.include_router(admin_services.catalog_router)
 app.include_router(admin_settings.router)
+app.include_router(customer_portal.router)
 app.include_router(technician_profile.router)
 app.include_router(technician_time_off.router)
 app.include_router(auth.router)
@@ -113,5 +117,5 @@ def handle_database_operational_error(_: Request, __: OperationalError):
 
 @app.get("/")
 def root():
-    return {"message": "DispatchIQ technician profile APIs are active."}
+    return {"message": "DispatchIQ customer, admin, technician, and integration APIs are active."}
 

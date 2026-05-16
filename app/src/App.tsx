@@ -7,6 +7,11 @@ import { HomeRoute, PublicOnly, RequireRole } from '@/components/auth/RouteGuard
 import AdminLoginPage from '@/pages/auth/AdminLogin';
 import TechnicianLoginPage from '@/pages/auth/TechnicianLogin';
 import TechnicianSignupPage from '@/pages/auth/TechnicianSignup';
+import CustomerHome from '@/pages/customer/CustomerHome';
+import CustomerServices from '@/pages/customer/CustomerServices';
+import CustomerRequestService from '@/pages/customer/CustomerRequestService';
+import CustomerStatus from '@/pages/customer/CustomerStatus';
+import CustomerSupport from '@/pages/customer/CustomerSupport';
 
 // Admin Pages
 import AdminDashboard from '@/pages/admin/Dashboard';
@@ -17,6 +22,7 @@ import InvoiceApprovalsPage from '@/pages/admin/InvoiceApprovals';
 import TechniciansPage from '@/pages/admin/Technicians';
 import TechnicianAccountsPage from '@/pages/admin/TechnicianAccounts';
 import DealershipsPage from '@/pages/admin/Dealerships';
+import CustomerConversationsPage from '@/pages/admin/CustomerConversations';
 import ServicesPage from '@/pages/admin/Services';
 import ReportsPage from '@/pages/admin/Reports';
 import SettingsPage from '@/pages/admin/Settings';
@@ -48,6 +54,15 @@ function App() {
           <Route path="/admin/login" element={<PublicOnly><AdminLoginPage /></PublicOnly>} />
           <Route path="/tech/login" element={<PublicOnly><TechnicianLoginPage /></PublicOnly>} />
           <Route path="/tech/signup" element={<PublicOnly><TechnicianSignupPage /></PublicOnly>} />
+
+          {/* Customer Portal */}
+          <Route path="/customer" element={<CustomerHome />} />
+          <Route path="/customer/services" element={<CustomerServices />} />
+          <Route path="/customer/request-service" element={<CustomerRequestService />} />
+          <Route path="/customer/status" element={<CustomerStatus />} />
+          <Route path="/customer/support" element={<CustomerSupport />} />
+          <Route path="/book" element={<Navigate to="/customer/request-service" replace />} />
+          <Route path="/customer/*" element={<Navigate to="/customer" replace />} />
 
           {/* Admin Preview Mode - Technician Portal Preview (No AdminLayout) */}
           <Route
@@ -146,6 +161,9 @@ function App() {
                     <Route path="jobs/:jobId" element={<JobDetailPage />} />
                     <Route path="invoice-approvals" element={<InvoiceApprovalsPage />} />
                     <Route path="invoice-history" element={<InvoiceHistoryPage />} />
+                    <Route path="customer-conversations" element={<CustomerConversationsPage />} />
+                    <Route path="customer-conversations/:conversationId" element={<CustomerConversationsPage />} />
+                    <Route path="chat/customers" element={<Navigate to="/admin/customer-conversations" replace />} />
                     <Route path="technicians" element={<TechniciansPage />} />
                     <Route path="technician-accounts" element={<TechnicianAccountsPage />} />
                     <Route path="dealerships" element={<DealershipsPage />} />

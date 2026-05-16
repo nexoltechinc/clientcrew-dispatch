@@ -34,6 +34,8 @@ class AuditEntityType(str, Enum):
     TECHNICIAN_EMAIL_CHANGE_REQUEST = "technician_email_change_request"
     JOB = "job"
     INVOICE = "invoice"
+    CUSTOMER_CONVERSATION = "customer_conversation"
+    CUSTOMER_INTAKE = "customer_intake"
 
 
 class JobWorkflowStatus(str, Enum):

@@ -36,3 +36,18 @@ class EmailService:
             smtp.login(SMTP_EMAIL, SMTP_APP_PASSWORD)
             smtp.send_message(message)
 
+    def send_plain_email(self, *, recipient_email: str, subject: str, body_text: str) -> None:
+        if not SMTP_EMAIL or not SMTP_APP_PASSWORD:
+            raise RuntimeError("SMTP_EMAIL and SMTP_APP_PASSWORD must be configured for outbound emails")
+
+        message = EmailMessage()
+        message["Subject"] = subject.strip()
+        message["From"] = f"{SMTP_FROM_NAME} <{SMTP_EMAIL}>"
+        message["To"] = recipient_email
+        message.set_content(body_text)
+
+        with smtplib.SMTP(SMTP_HOST, SMTP_PORT, timeout=20) as smtp:
+            smtp.starttls()
+            smtp.login(SMTP_EMAIL, SMTP_APP_PASSWORD)
+            smtp.send_message(message)
+

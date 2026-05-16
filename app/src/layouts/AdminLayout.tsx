@@ -61,10 +61,12 @@ import { Separator } from '@/components/ui/separator';
 import { TechnicianPreviewModal } from '@/components/modals/TechnicianPreviewModal';
 import {
   fetchAdminDealerships,
+  fetchAdminCustomerConversationSummary,
   fetchAdminJobs,
   fetchAdminTechnicians,
   fetchInvoices,
   getStoredAdminToken,
+  type BackendCustomerConversationSummary,
   type BackendAdminJob,
   type BackendDealership,
   type BackendInvoice,
@@ -87,6 +89,8 @@ type ChromeCounts = {
   onlineTechnicians: number;
   overdueInvoices: number;
   liveJobs: number;
+  customerConversationUnread: number;
+  customerConversationUrgent: number;
 };
 
 type SearchItem = {
@@ -112,6 +116,7 @@ type ChromeData = {
   technicians: BackendTechnicianListItem[];
   dealerships: BackendDealership[];
   invoices: BackendInvoice[];
+  customerConversationSummary: BackendCustomerConversationSummary | null;
   loadedAt: string | null;
   syncTone: StatusTone;
 };
@@ -169,6 +174,7 @@ const NAV_SECTIONS: Array<{
   {
     title: 'CRM',
     items: [
+      { path: '/admin/customer-conversations', matchPath: '/admin/customer-conversations', label: 'Customer Conversations', icon: Inbox, badgeKey: 'customerConversationUnread' },
       { path: '/admin/dealerships?view=locations', matchPath: '/admin/dealerships', label: 'Locations', icon: MapPin },
       { path: '/admin/technicians', matchPath: '/admin/technicians', label: 'Technicians', icon: Users },
       { path: '/admin/technician-accounts', matchPath: '/admin/technician-accounts', label: 'Tech Accounts', icon: UserCog },
@@ -191,6 +197,7 @@ const PAGE_SEARCH_ITEMS: SearchItem[] = [
   { group: 'Pages', label: 'Calendar', description: 'Scheduling and availability', href: '/admin/calendar', keywords: ['calendar', 'schedule', 'availability'], icon: CalendarDays },
   { group: 'Pages', label: 'Jobs', description: 'Dispatch board and filters', href: '/admin/jobs', keywords: ['jobs', 'dispatch', 'queue'], icon: Briefcase },
   { group: 'Pages', label: 'Invoice Approvals', description: 'Finance review queue', href: '/admin/invoice-approvals', keywords: ['invoice', 'approvals', 'finance'], icon: FileCheck },
+  { group: 'Pages', label: 'Customer Conversations', description: 'Dispatch inbox for customer chatbot and portal requests', href: '/admin/customer-conversations', keywords: ['customer conversations', 'chat', 'inbox', 'support', 'portal'], icon: Inbox },
   { group: 'Pages', label: 'Technicians', description: 'Field team roster', href: '/admin/technicians', keywords: ['technicians', 'crew', 'field team'], icon: Users },
   { group: 'Pages', label: 'Customers', description: 'CRM customer records', href: '/admin/dealerships', keywords: ['customers', 'dealerships', 'locations'], icon: UserCircle2 },
   { group: 'Pages', label: 'Reports', description: 'Analytics and performance', href: '/admin/reports', keywords: ['reports', 'analytics', 'performance'], icon: BarChart3 },
@@ -261,7 +268,12 @@ function jobLocation(job: BackendAdminJob, dealerships: BackendDealership[]) {
   return dealership?.city?.trim() || dealership?.address?.trim() || 'Dispatch territory';
 }
 
-function getCounts(jobs: BackendAdminJob[], technicians: BackendTechnicianListItem[], invoices: BackendInvoice[]): ChromeCounts {
+function getCounts(
+  jobs: BackendAdminJob[],
+  technicians: BackendTechnicianListItem[],
+  invoices: BackendInvoice[],
+  customerConversationSummary: BackendCustomerConversationSummary | null,
+): ChromeCounts {
   const pendingIntakes = jobs.filter((job) => {
     const status = normalizeStatus(job.status);
     return status === 'pending_review' || status === 'pending_admin_confirmation' || status === 'admin_preview' || status === 'pending';
@@ -283,6 +295,9 @@ function getCounts(jobs: BackendAdminJob[], technicians: BackendTechnicianListIt
     return status === 'in_progress' || status === 'assigned' || status === 'scheduled';
   }).length;
 
+  const customerConversationUnread = customerConversationSummary?.unread ?? 0;
+  const customerConversationUrgent = customerConversationSummary?.urgent ?? 0;
+
   return {
     pendingIntakes,
     invoiceApprovals,
@@ -290,6 +305,8 @@ function getCounts(jobs: BackendAdminJob[], technicians: BackendTechnicianListIt
     onlineTechnicians,
     overdueInvoices,
     liveJobs,
+    customerConversationUnread,
+    customerConversationUrgent,
   };
 }
 
@@ -354,6 +371,26 @@ function buildNotifications(counts: ChromeCounts, syncTone: StatusTone): Notific
       href: '/admin/technicians',
       tone: 'warning',
       icon: Users,
+    });
+  }
+  if (counts.customerConversationUnread > 0) {
+    items.push({
+      id: 'customer-conversations-unread',
+      label: 'Unread customer conversations',
+      description: `${counts.customerConversationUnread} conversation(s) are waiting for an admin reply.`,
+      href: '/admin/customer-conversations',
+      tone: 'warning',
+      icon: Inbox,
+    });
+  }
+  if (counts.customerConversationUrgent > 0) {
+    items.push({
+      id: 'customer-conversations-urgent',
+      label: 'Urgent customer conversations',
+      description: `${counts.customerConversationUrgent} conversation(s) are marked urgent.`,
+      href: '/admin/customer-conversations',
+      tone: 'critical',
+      icon: AlertTriangle,
     });
   }
 
@@ -908,6 +945,7 @@ export function AdminLayout({ children }: { children: ReactNode }) {
     technicians: [],
     dealerships: [],
     invoices: [],
+    customerConversationSummary: null,
     loadedAt: null,
     syncTone: 'live',
   });
@@ -934,6 +972,7 @@ export function AdminLayout({ children }: { children: ReactNode }) {
         technicians: [],
         dealerships: [],
         invoices: [],
+        customerConversationSummary: null,
         loadedAt: null,
         syncTone: 'critical',
       }));
@@ -943,11 +982,12 @@ export function AdminLayout({ children }: { children: ReactNode }) {
     }
 
     try {
-      const [jobs, technicians, dealerships, invoices] = await Promise.all([
+      const [jobs, technicians, dealerships, invoices, customerConversationSummary] = await Promise.all([
         fetchAdminJobs(token),
         fetchAdminTechnicians(token),
         fetchAdminDealerships(token),
         fetchInvoices(token),
+        fetchAdminCustomerConversationSummary(token),
       ]);
 
       setChromeData({
@@ -955,6 +995,7 @@ export function AdminLayout({ children }: { children: ReactNode }) {
         technicians,
         dealerships,
         invoices,
+        customerConversationSummary,
         loadedAt: new Date().toISOString(),
         syncTone: 'live',
       });
@@ -998,7 +1039,10 @@ export function AdminLayout({ children }: { children: ReactNode }) {
     window.localStorage.setItem(WORKSPACE_STORAGE_KEY, workspace.id);
   }, [workspace]);
 
-  const counts = useMemo(() => getCounts(chromeData.jobs, chromeData.technicians, chromeData.invoices), [chromeData.jobs, chromeData.technicians, chromeData.invoices]);
+  const counts = useMemo(
+    () => getCounts(chromeData.jobs, chromeData.technicians, chromeData.invoices, chromeData.customerConversationSummary),
+    [chromeData.jobs, chromeData.technicians, chromeData.invoices, chromeData.customerConversationSummary],
+  );
   const searchItems = useMemo(() => buildSearchItems(chromeData, counts), [chromeData, counts]);
   const notifications = useMemo(() => buildNotifications(counts, chromeData.syncTone), [counts, chromeData.syncTone]);
   const headerTitle = buildHeaderTitle(location.pathname, location.search);
