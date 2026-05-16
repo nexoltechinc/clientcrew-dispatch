@@ -101,7 +101,7 @@ class PriorityRulesService:
 
         defaults = [
             PriorityRule(
-                description="Always prioritize Audi de Quebec jobs",
+                description="Always prioritize Northwind Auto jobs",
                 dealership_id="D-005",
                 target_urgency="HIGH",
                 ranking_score=10,
@@ -131,3 +131,4 @@ class PriorityRulesService:
         ]
         self.db.bulk_save_objects(defaults)
         self.db.commit()
+

@@ -9,6 +9,7 @@ import {
     Calendar,
     ArrowUpRight,
     CheckCircle2,
+    DollarSign,
 } from 'lucide-react';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
@@ -73,7 +74,7 @@ const extractJobCodeFromInvoice = (invoice: BackendInvoice): string => {
     if (invoice.job_code && invoice.job_code.trim()) {
         return invoice.job_code.trim();
     }
-    const regex = /SM2-\d{4}-\d+/i;
+    const regex = /DIQ-\d{4}-\d+/i;
     for (const line of invoice.line_items || []) {
         const text = `${line.description || ''} ${line.product_service || ''}`;
         const match = text.match(regex);
@@ -192,6 +193,39 @@ export default function InvoiceHistoryPage() {
 
         return matchesSearch && matchesStatus && matchesPeriod;
     }), [filterPeriod, filterStatus, history, searchQuery]);
+
+    const hasActiveFilters = searchQuery.trim().length > 0 || filterStatus !== 'all' || filterPeriod !== 'all';
+
+    const historySummary = useMemo(() => {
+        const customerNames = new Set<string>();
+        let totalValue = 0;
+        let paidCount = 0;
+
+        filteredHistory.forEach((invoice) => {
+            const customerName = (invoice.dealership_name || invoice.bill_to?.name || '').trim();
+            if (customerName.length > 0) {
+                customerNames.add(customerName);
+            }
+            totalValue += toNumber(invoice.total);
+            if (invoice.status === 'paid') {
+                paidCount += 1;
+            }
+        });
+
+        return {
+            visibleCount: filteredHistory.length,
+            totalCount: history.length,
+            totalValue,
+            customerCount: customerNames.size,
+            paidCount,
+        };
+    }, [filteredHistory, history]);
+
+    const handleClearFilters = () => {
+        setSearchQuery('');
+        setFilterStatus('all');
+        setFilterPeriod('all');
+    };
 
     const handleViewInvoice = (invoice: BackendInvoice) => {
         setSelectedInvoice(invoice);
@@ -387,7 +421,7 @@ export default function InvoiceHistoryPage() {
 
     return (
         <div className="flex flex-col h-full space-y-6">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <div>
                     <h1 className="text-2xl font-bold text-foreground tracking-tight">Invoice History</h1>
                     <p className="text-sm text-muted-foreground font-medium">Archive of all approved and processed invoices</p>
@@ -411,20 +445,66 @@ export default function InvoiceHistoryPage() {
                 onConfirm={handleExport}
             />
 
-            <Card className="p-4 border-border shadow-sm">
-                <div className="flex flex-col md:flex-row gap-4">
-                    <div className="relative flex-1">
+            <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+                <Card className="border-border/60 bg-card/80 p-4 shadow-sm backdrop-blur">
+                    <p className="text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">Invoices in view</p>
+                    <div className="mt-3 flex items-end justify-between gap-4">
+                        <div>
+                            <p className="text-3xl font-bold text-foreground">{historySummary.visibleCount}</p>
+                            <p className="text-xs text-muted-foreground">{historySummary.totalCount} total invoices in archive</p>
+                        </div>
+                        <FileText className="h-5 w-5 text-cyan-300" />
+                    </div>
+                </Card>
+
+                <Card className="border-border/60 bg-card/80 p-4 shadow-sm backdrop-blur">
+                    <p className="text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">Invoice value</p>
+                    <div className="mt-3 flex items-end justify-between gap-4">
+                        <div>
+                            <p className="text-3xl font-bold text-foreground">${historySummary.totalValue.toFixed(2)}</p>
+                            <p className="text-xs text-muted-foreground">Visible archive total</p>
+                        </div>
+                        <DollarSign className="h-5 w-5 text-emerald-300" />
+                    </div>
+                </Card>
+
+                <Card className="border-border/60 bg-card/80 p-4 shadow-sm backdrop-blur">
+                    <p className="text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">Paid invoices</p>
+                    <div className="mt-3 flex items-end justify-between gap-4">
+                        <div>
+                            <p className="text-3xl font-bold text-foreground">{historySummary.paidCount}</p>
+                            <p className="text-xs text-muted-foreground">Settled records in view</p>
+                        </div>
+                        <CheckCircle2 className="h-5 w-5 text-emerald-300" />
+                    </div>
+                </Card>
+
+                <Card className="border-border/60 bg-card/80 p-4 shadow-sm backdrop-blur">
+                    <p className="text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">Customers involved</p>
+                    <div className="mt-3 flex items-end justify-between gap-4">
+                        <div>
+                            <p className="text-3xl font-bold text-foreground">{historySummary.customerCount}</p>
+                            <p className="text-xs text-muted-foreground">Unique dealerships in view</p>
+                        </div>
+                        <Building2 className="h-5 w-5 text-amber-300" />
+                    </div>
+                </Card>
+            </div>
+
+            <Card className="border-border/60 bg-card/80 p-4 shadow-sm backdrop-blur">
+                <div className="grid gap-3 xl:grid-cols-[minmax(0,1fr)_auto] xl:items-center">
+                    <div className="relative min-w-0">
                         <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                         <Input
                             placeholder="Search by invoice, job code, customer..."
-                            className="pl-9 bg-muted/30 border-border focus:bg-background transition-all h-10"
+                            className="h-10 border-border/60 bg-background/60 pl-9 text-foreground transition-all placeholder:text-muted-foreground focus:bg-background"
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
                         />
                     </div>
-                    <div className="flex gap-2">
+                    <div className="flex flex-wrap gap-2">
                         <Select value={filterStatus} onValueChange={(value) => setFilterStatus(value as InvoiceStatusFilter)}>
-                            <SelectTrigger className="w-[150px] h-10">
+                            <SelectTrigger className="h-10 w-full border-dashed border-border/60 bg-background/60 text-foreground sm:w-[150px]">
                                 <SelectValue placeholder="Status" />
                             </SelectTrigger>
                             <SelectContent>
@@ -437,7 +517,7 @@ export default function InvoiceHistoryPage() {
                             </SelectContent>
                         </Select>
                         <Select value={filterPeriod} onValueChange={(value) => setFilterPeriod(value as InvoicePeriodFilter)}>
-                            <SelectTrigger className="w-[150px] h-10">
+                            <SelectTrigger className="h-10 w-full border-dashed border-border/60 bg-background/60 text-foreground sm:w-[150px]">
                                 <div className="flex items-center gap-2">
                                     <Calendar className="w-4 h-4" />
                                     <SelectValue placeholder="Period" />
@@ -452,87 +532,132 @@ export default function InvoiceHistoryPage() {
                                 <SelectItem value="year">This year</SelectItem>
                             </SelectContent>
                         </Select>
+                        <Badge variant="outline" className="border-cyan-500/30 bg-cyan-500/10 text-cyan-200">
+                            Invoice Archive ({historySummary.visibleCount})
+                        </Badge>
+                        <Button
+                            variant="ghost"
+                            className="text-muted-foreground hover:bg-muted/50 hover:text-foreground"
+                            onClick={handleClearFilters}
+                            disabled={!hasActiveFilters}
+                        >
+                            Clear filters
+                        </Button>
                     </div>
+                </div>
+                <div className="mt-3 flex flex-wrap items-center gap-2 text-xs">
+                    <Badge variant="outline" className="border-border/60 bg-background/60 text-muted-foreground">
+                        Showing {historySummary.visibleCount} of {historySummary.totalCount} invoices
+                    </Badge>
+                    <Badge variant="outline" className="border-border/60 bg-background/60 text-muted-foreground">
+                        {historySummary.customerCount} customers
+                    </Badge>
+                    <Badge variant="outline" className="border-border/60 bg-background/60 text-muted-foreground">
+                        {historySummary.paidCount} paid
+                    </Badge>
                 </div>
             </Card>
 
-            <div className="flex-1 bg-card border border-border rounded-xl shadow-sm overflow-hidden min-h-[500px]">
+            <div className="flex-1 overflow-hidden rounded-xl border border-border/60 bg-card/80 shadow-sm min-h-[500px]">
                 {loading ? (
                     <div className="p-6 space-y-4">
-                        {[1, 2, 3, 4, 5].map(i => <Skeleton key={i} className="h-12 w-full" />)}
+                        {[1, 2, 3, 4, 5].map((i) => <Skeleton key={i} className="h-12 w-full" />)}
                     </div>
                 ) : filteredHistory.length === 0 ? (
                     <div className="flex flex-col items-center justify-center py-24 text-muted-foreground">
                         <FileText className="w-12 h-12 mb-4 opacity-20" />
                         <p className="font-medium text-foreground">No invoices found</p>
-                        <p className="text-sm">Try adjusting your search filters</p>
+                        <p className="text-sm text-center max-w-sm">
+                            {hasActiveFilters
+                                ? 'Clear the filters to return to the full archive.'
+                                : 'Approved and processed invoices will appear here once jobs are completed.'}
+                        </p>
+                        <Button
+                            variant="outline"
+                            className="mt-4"
+                            onClick={handleClearFilters}
+                            disabled={!hasActiveFilters}
+                        >
+                            Clear filters
+                        </Button>
                     </div>
                 ) : (
-                    <Table>
-                        <TableHeader className="bg-muted/50">
-                            <TableRow>
-                                <TableHead className="pl-6">Invoice / Job</TableHead>
-                                <TableHead>Customer</TableHead>
-                                <TableHead>Technician</TableHead>
-                                <TableHead>Created Date</TableHead>
-                                <TableHead className="text-right">Amount</TableHead>
-                                <TableHead className="text-center">Status</TableHead>
-                                <TableHead className="w-[80px] pr-6"></TableHead>
-                            </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                            {filteredHistory.map((inv) => (
-                                <TableRow key={inv.id} className="hover:bg-muted/30 transition-colors group cursor-pointer" onClick={() => handleViewInvoice(inv)}>
-                                    <TableCell className="pl-6 py-4">
-                                        <div className="flex flex-col">
-                                            <span className="font-bold text-foreground text-sm">{inv.invoice_number}</span>
-                                            <span className="text-xs text-muted-foreground font-mono">{extractJobCodeFromInvoice(inv)}</span>
-                                        </div>
-                                    </TableCell>
-                                    <TableCell>
-                                        <div className="flex items-center gap-2">
-                                            <Building2 className="w-3.5 h-3.5 text-muted-foreground" />
-                                            <span className="text-foreground font-medium text-sm">{inv.dealership_name || inv.bill_to?.name || '-'}</span>
-                                        </div>
-                                    </TableCell>
-                                    <TableCell>
-                                        <div className="flex items-center gap-2">
-                                            <div className="w-6 h-6 rounded-full bg-[#2F8E92]/10 flex items-center justify-center text-[10px] font-bold text-[#2F8E92]">
-                                                {resolveTechnician(inv).substring(0, 2)}
-                                            </div>
-                                            <span className="text-foreground text-sm">{resolveTechnician(inv)}</span>
-                                        </div>
-                                    </TableCell>
-                                    <TableCell>
-                                        <span className="text-muted-foreground text-xs">{format(new Date(inv.created_at), 'MMM dd, yyyy - HH:mm')}</span>
-                                    </TableCell>
-                                    <TableCell className="text-right font-mono font-bold text-foreground">
-                                        ${toNumber(inv.total).toFixed(2)}
-                                    </TableCell>
-                                    <TableCell className="text-center">
-                                        <Badge
-                                            variant="outline"
-                                            className={cn(
-                                                'capitalize text-[10px] px-2 py-0.5',
-                                                inv.status === 'paid' ? 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20' :
-                                                    inv.status === 'sent' ? 'bg-blue-500/10 text-blue-500 border-blue-500/20' :
-                                                        inv.status === 'overdue' ? 'bg-orange-500/10 text-orange-500 border-orange-500/20' :
-                                                            inv.status === 'cancelled' ? 'bg-red-500/10 text-red-500 border-red-500/20' :
-                                                                'bg-gray-500/10 text-muted-foreground border-border',
-                                            )}
-                                        >
-                                            {inv.status}
-                                        </Badge>
-                                    </TableCell>
-                                    <TableCell className="pr-6 text-right">
-                                        <Button variant="ghost" size="icon" className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity">
-                                            <ArrowUpRight className="w-4 h-4 text-[#2F8E92]" />
-                                        </Button>
-                                    </TableCell>
+                    <div className="overflow-x-auto">
+                        <Table className="table-fixed">
+                            <TableHeader className="sticky top-0 z-10 bg-muted/30 backdrop-blur">
+                                <TableRow>
+                                    <TableHead className="w-[170px] pl-6 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Invoice / Job</TableHead>
+                                    <TableHead className="w-[200px] text-xs font-semibold uppercase tracking-wider text-muted-foreground">Customer</TableHead>
+                                    <TableHead className="w-[160px] text-xs font-semibold uppercase tracking-wider text-muted-foreground">Technician</TableHead>
+                                    <TableHead className="hidden lg:table-cell w-[150px] text-xs font-semibold uppercase tracking-wider text-muted-foreground">Created Date</TableHead>
+                                    <TableHead className="w-[110px] text-right text-xs font-semibold uppercase tracking-wider text-muted-foreground">Amount</TableHead>
+                                    <TableHead className="w-[110px] text-center text-xs font-semibold uppercase tracking-wider text-muted-foreground">Status</TableHead>
+                                    <TableHead className="w-[96px] pr-6 text-right text-xs font-semibold uppercase tracking-wider text-muted-foreground">Action</TableHead>
                                 </TableRow>
-                            ))}
-                        </TableBody>
-                    </Table>
+                            </TableHeader>
+                            <TableBody>
+                                {filteredHistory.map((inv) => (
+                                    <TableRow key={inv.id} className="group cursor-pointer border-border/40 transition-colors hover:bg-muted/20" onClick={() => handleViewInvoice(inv)}>
+                                        <TableCell className="pl-6 align-top py-4">
+                                            <div className="flex flex-col gap-1">
+                                                <span className="font-bold text-foreground text-sm group-hover:text-cyan-300">{inv.invoice_number}</span>
+                                                <span className="text-xs text-muted-foreground font-mono">{extractJobCodeFromInvoice(inv)}</span>
+                                            </div>
+                                        </TableCell>
+                                        <TableCell className="align-top">
+                                            <div className="flex items-center gap-2">
+                                                <Building2 className="w-3.5 h-3.5 text-muted-foreground" />
+                                                <span className="text-foreground font-medium text-sm">{inv.dealership_name || inv.bill_to?.name || '-'}</span>
+                                            </div>
+                                        </TableCell>
+                                        <TableCell className="align-top">
+                                            <div className="flex items-center gap-2">
+                                                <div className="w-6 h-6 rounded-full bg-[#2F8E92]/10 flex items-center justify-center text-[10px] font-bold text-[#2F8E92]">
+                                                    {resolveTechnician(inv).substring(0, 2)}
+                                                </div>
+                                                <span className="text-foreground text-sm">{resolveTechnician(inv)}</span>
+                                            </div>
+                                        </TableCell>
+                                        <TableCell className="hidden lg:table-cell align-top">
+                                            <span className="text-muted-foreground text-xs">{format(new Date(inv.created_at), 'MMM dd, yyyy - HH:mm')}</span>
+                                        </TableCell>
+                                        <TableCell className="align-top text-right font-mono font-bold text-foreground">
+                                            ${toNumber(inv.total).toFixed(2)}
+                                        </TableCell>
+                                        <TableCell className="align-top text-center">
+                                            <Badge
+                                                variant="outline"
+                                                className={cn(
+                                                    'capitalize text-[10px] px-2 py-0.5',
+                                                    inv.status === 'paid' ? 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20' :
+                                                        inv.status === 'sent' ? 'bg-blue-500/10 text-blue-500 border-blue-500/20' :
+                                                            inv.status === 'overdue' ? 'bg-orange-500/10 text-orange-500 border-orange-500/20' :
+                                                                inv.status === 'cancelled' ? 'bg-red-500/10 text-red-500 border-red-500/20' :
+                                                                    'bg-gray-500/10 text-muted-foreground border-border',
+                                                )}
+                                            >
+                                                {inv.status}
+                                            </Badge>
+                                        </TableCell>
+                                        <TableCell className="align-top pr-6 text-right">
+                                            <Button
+                                                variant="outline"
+                                                size="sm"
+                                                className="h-8 gap-1.5 border-border/60 bg-background/60 text-foreground hover:bg-muted/40"
+                                                onClick={(event) => {
+                                                    event.stopPropagation();
+                                                    handleViewInvoice(inv);
+                                                }}
+                                            >
+                                                View
+                                                <ArrowUpRight className="w-4 h-4 text-[#2F8E92]" />
+                                            </Button>
+                                        </TableCell>
+                                    </TableRow>
+                                ))}
+                            </TableBody>
+                        </Table>
+                    </div>
                 )}
             </div>
 
@@ -615,3 +740,4 @@ export default function InvoiceHistoryPage() {
         </div>
     );
 }
+

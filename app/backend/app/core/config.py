@@ -88,23 +88,28 @@ CORS_ALLOW_ORIGINS = get_env_csv(
 )
 
 COMPANY_LOGO_URL = get_env("COMPANY_LOGO_URL", "")
-COMPANY_NAME = get_env("COMPANY_NAME", "Client-Crew Dispatch")
+COMPANY_NAME = get_env("COMPANY_NAME", "DispatchIQ")
 COMPANY_STREET_ADDRESS = get_env("COMPANY_STREET_ADDRESS", "123 Service Lane")
 COMPANY_CITY = get_env("COMPANY_CITY", "New York")
 COMPANY_STATE = get_env("COMPANY_STATE", "NY")
 COMPANY_ZIP_CODE = get_env("COMPANY_ZIP_CODE", "10001")
 COMPANY_PHONE = get_env("COMPANY_PHONE", "+1-555-010-1000")
-COMPANY_EMAIL = get_env("COMPANY_EMAIL", "billing@clientcrew-dispatch.com")
-COMPANY_WEBSITE = get_env("COMPANY_WEBSITE", "https://clientcrew-dispatch.vercel.app")
+COMPANY_EMAIL = get_env("COMPANY_EMAIL", "billing@dispatchiq.test")
+COMPANY_WEBSITE = get_env("COMPANY_WEBSITE", "https://dispatchiq.test")
+COMPANY_PRIMARY_COLOR = get_env("COMPANY_PRIMARY_COLOR", "#2F8E92")
 SMTP_EMAIL = get_env("SMTP_EMAIL", "").strip()
 SMTP_APP_PASSWORD = get_env("SMTP_APP_PASSWORD", "").strip()
 SMTP_HOST = get_env("SMTP_HOST", "smtp.gmail.com").strip()
 SMTP_PORT = int(get_env("SMTP_PORT", "587"))
-SMTP_FROM_NAME = get_env("SMTP_FROM_NAME", "SM2 Dispatch").strip()
+SMTP_FROM_NAME = get_env("SMTP_FROM_NAME", "DispatchIQ").strip()
 PASSWORD_RESET_OTP_TTL_MINUTES = int(get_env("PASSWORD_RESET_OTP_TTL_MINUTES", "5"))
 PASSWORD_RESET_TOKEN_TTL_MINUTES = int(get_env("PASSWORD_RESET_TOKEN_TTL_MINUTES", "10"))
 PASSWORD_RESET_MAX_ATTEMPTS = int(get_env("PASSWORD_RESET_MAX_ATTEMPTS", "3"))
 PASSWORD_RESET_MAX_REQUESTS_PER_HOUR = int(get_env("PASSWORD_RESET_MAX_REQUESTS_PER_HOUR", "3"))
+CUSTOMER_CONVERSATION_EMAIL_FALLBACK_ENABLED = get_env("CUSTOMER_CONVERSATION_EMAIL_FALLBACK_ENABLED", "true").strip().lower() not in {"0", "false", "no"}
+CUSTOMER_CONVERSATION_UNREAD_EMAIL_THRESHOLD_MINUTES = int(
+    get_env("CUSTOMER_CONVERSATION_UNREAD_EMAIL_THRESHOLD_MINUTES", "60")
+)
 QB_CLIENT_ID = get_env("QB_CLIENT_ID", "")
 QB_CLIENT_SECRET = get_env("QB_CLIENT_SECRET", "")
 QB_REDIRECT_URI = get_env("QB_REDIRECT_URI", "")
@@ -125,3 +130,4 @@ ADMIN_DEFAULT_PASSWORD = get_env("ADMIN_DEFAULT_PASSWORD", "admin123")
 
 if APP_ENV != "development" and JWT_SECRET_KEY.startswith("change-me"):
     raise RuntimeError("JWT_SECRET_KEY must be set to a secure value outside development")
+

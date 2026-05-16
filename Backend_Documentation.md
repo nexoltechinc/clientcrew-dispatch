@@ -1,8 +1,8 @@
-# SM2 Dispatch System: Technical & Functional Backend Specification
+# DispatchIQ System: Technical & Functional Backend Specification
 
 ## 1. System Overview & UML Architecture
 
-The SM2 Dispatch System is a distributed, event-driven platform. Below is the **Sequence Diagram** showing the end-to-end lifecycle of a job request.
+The DispatchIQ System is a distributed, event-driven platform. Below is the **Sequence Diagram** showing the end-to-end lifecycle of a job request.
 
 ### Job Lifecycle Sequence Diagram
 ```mermaid
@@ -49,7 +49,7 @@ To build a robust system, the database must handle relationships between dealers
 | Field | Type | Constraint | Description |
 | :--- | :--- | :--- | :--- |
 | `id` | UUID | PK | Unique Job ID |
-| `job_code` | String | Unique | Internal reference (e.g., SM2-2024-001) |
+| `job_code` | String | Unique | Internal reference (e.g., DIQ-2024-001) |
 | `dealership_id` | UUID | FK | Link to **Dealerships** |
 | `tech_id` | UUID | FK (nullable) | Assigned **Technician** |
 | `service_id` | UUID | FK | Link to **Services** Catalog |
@@ -209,4 +209,5 @@ To ensure the frontend works correctly, the backend should expose the following 
 3.  **Phase 3**: Build the Technician Mobile web interface for real-time status updates.
 4.  **Phase 4**: Finalize the QuickBooks OAuth 2.0 flow for secure invoicing.
 5.  **Phase 5**: Implement real-time notifications (WebSockets or Server-Sent Events) for the Admin Dashboard.
+
 

@@ -171,7 +171,7 @@ export const MOCK_DEALERSHIPS: Dealership[] = [
     },
     {
         id: "D-005",
-        name: "Audi De Quebec",
+        name: "Northwind Auto",
         phone: "15817058089",
         email: "comptabilite@audidequebec.com, jvilleneuve@audidequebec.com",
         address: "5200 Rue John Molson",
@@ -223,7 +223,7 @@ export const MOCK_DEALERSHIPS: Dealership[] = [
     },
     {
         id: "D-009",
-        name: "Germain Nissan Donnacona",
+        name: "Summit Motors",
         phone: "14182850970",
         email: "dthibault@germainnissan.ca",
         address: "104 Rue Commerciale",
@@ -236,7 +236,7 @@ export const MOCK_DEALERSHIPS: Dealership[] = [
     },
     {
         id: "D-010",
-        name: "Donnacona Chrysler Jeep Dodge Ram",
+        name: "Atlas Auto Group",
         phone: "",
         email: "",
         address: "160 Rue Commerciale",
@@ -249,7 +249,7 @@ export const MOCK_DEALERSHIPS: Dealership[] = [
     },
     {
         id: "D-011",
-        name: "Donnacona Ford",
+        name: "Summit Ford",
         phone: "",
         email: "",
         address: "128 Bd Les Ecureuils",
@@ -262,7 +262,7 @@ export const MOCK_DEALERSHIPS: Dealership[] = [
     },
     {
         id: "D-012",
-        name: "Donnacona Mazda",
+        name: "Northstar Mazda",
         phone: "41852852020",
         email: "aprovost@donnaconamazda.com",
         address: "141 Rue Commerciale",
@@ -288,7 +288,7 @@ export const MOCK_DEALERSHIPS: Dealership[] = [
     },
     {
         id: "D-014",
-        name: "Germain Nissan Donnacona",
+        name: "Summit Motors",
         phone: "",
         email: "",
         address: "104 Rue Commerciale",
@@ -301,7 +301,7 @@ export const MOCK_DEALERSHIPS: Dealership[] = [
     },
     {
         id: "D-015",
-        name: "Honda Donnacona",
+        name: "Pioneer Honda",
         phone: "",
         email: "",
         address: "159 Rue Commerciale",
@@ -392,7 +392,7 @@ export const MOCK_DEALERSHIPS: Dealership[] = [
     },
     {
         id: "D-022",
-        name: "Ville De Quebec",
+        name: "City Services",
         phone: "",
         email: "karyne.legere@ville.quebec.qc.ca",
         address: "",
@@ -548,7 +548,7 @@ export const MOCK_DEALERSHIPS: Dealership[] = [
     },
     {
         id: "D-034",
-        name: "St-Raymond Toyota",
+        name: "Harbor Toyota",
         phone: "",
         email: "",
         address: "565 Cote Joyeuse",
@@ -587,7 +587,7 @@ export const MOCK_DEALERSHIPS: Dealership[] = [
     },
     {
         id: "D-037",
-        name: "Ville De Quebec  Service De Finance",
+        name: "City Services  Service De Finance",
         phone: "",
         email: "Karyne.legere@ville.quebec.qc.ca",
         address: "65 Rue Sainte-Anne,R-C",
@@ -1213,3 +1213,4 @@ export default function DealershipsPage() {
         </div>
     );
 }
+

@@ -6,7 +6,7 @@
 
 @layer base {
   :root {
-    /* SM2 Dispatch Design System */
+    /* DispatchIQ Design System */
     --background: 220 14% 97%;
     --background-secondary: 220 13% 95%;
     --foreground: 220 25% 9%;
@@ -489,3 +489,4 @@
     display: none !important;
   }
 }
+

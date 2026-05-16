@@ -349,9 +349,9 @@ export default function TechniciansPage() {
             void fetchTechs();
         };
 
-        window.addEventListener('sm-dispatch:admin-refresh', handleAdminRefresh);
+        window.addEventListener('dispatchiq:admin-refresh', handleAdminRefresh);
         return () => {
-            window.removeEventListener('sm-dispatch:admin-refresh', handleAdminRefresh);
+            window.removeEventListener('dispatchiq:admin-refresh', handleAdminRefresh);
         };
     }, [fetchTechs]);
 
@@ -1535,6 +1535,7 @@ export default function TechniciansPage() {
         </div>
     );
 }
+
 
 
 

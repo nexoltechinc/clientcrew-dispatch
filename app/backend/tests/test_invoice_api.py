@@ -32,7 +32,7 @@ class InvoiceApiTests(unittest.TestCase):
         cls.client = TestClient(app)
         token_response = cls.client.post(
             "/auth/dev/admin-token",
-            json={"email": "admin@sm2dispatch.com", "password": "admin123"},
+            json={"email": "admin@dispatchiq.test", "password": "admin123"},
         )
         assert token_response.status_code == 200
         cls.auth_header = {"Authorization": f"Bearer {token_response.json()['access_token']}"}
@@ -84,7 +84,7 @@ class InvoiceApiTests(unittest.TestCase):
             row = Dealership(
                 id=uuid4(),
                 code="D-900",
-                name="Audi de Quebec",
+                name="Northwind Auto",
                 phone="+1-418-555-2200",
                 email="service@audidequebec.com",
                 address="999 Grande Allee",
@@ -101,8 +101,8 @@ class InvoiceApiTests(unittest.TestCase):
         with SessionLocal() as db:
             row = Technician(
                 id=uuid4(),
-                name="Jolianne",
-                email="jolianne@sm2dispatch.com",
+                name="Taylor Brooks",
+                email="jolianne@dispatchiq.test",
                 phone="+1-418-555-0101",
                 status="active",
             )
@@ -114,14 +114,14 @@ class InvoiceApiTests(unittest.TestCase):
     def test_invoice_crud_routes_with_dispatch_jobs(self):
         dealership = self._seed_dealership()
         job_1_id = self._seed_completed_job(
-            code="SM2-2024-1001",
+            code="DIQ-2024-1001",
             dealership=dealership,
             service="Transponder Key Programming",
             hours=Decimal("2.00"),
             rate=Decimal("95.00"),
         )
         job_2_id = self._seed_completed_job(
-            code="SM2-2024-1002",
+            code="DIQ-2024-1002",
             dealership=dealership,
             service="Service Call",
             hours=Decimal("1.00"),
@@ -133,7 +133,7 @@ class InvoiceApiTests(unittest.TestCase):
             "terms": "NET_15",
             "shipping": "10.00",
             "status": "sent",
-            "customer_message": "Thank you for choosing SM2 Dispatch.",
+            "customer_message": "Thank you for choosing DispatchIQ.",
         }
         create_res = self.client.post("/invoices", json=create_payload, headers=self.auth_header)
         self.assertEqual(create_res.status_code, 201, create_res.text)
@@ -198,7 +198,7 @@ class InvoiceApiTests(unittest.TestCase):
         with SessionLocal() as db:
             row = Job(
                 id=uuid4(),
-                job_code="SM2-2024-2001",
+                job_code="DIQ-2024-2001",
                 status="COMPLETED",
                 service_type="Emergency Lockout",
                 hours_worked=Decimal("1.00"),
@@ -232,17 +232,17 @@ class InvoiceApiTests(unittest.TestCase):
             "terms": "CUSTOM",
             "custom_term_days": 10,
             "company_info": {
-                "name": "SM2 Dispatch",
+                "name": "DispatchIQ",
                 "street_address": "123 Dispatch Ave",
                 "city": "Quebec",
                 "state": "QC",
                 "zip_code": "G1A 1A1",
                 "phone": "+1-418-555-0100",
-                "email": "billing@sm2dispatch.com",
-                "website": "https://www.sm2dispatch.com",
+                "email": "billing@dispatchiq.test",
+                "website": "https://www.dispatchiq.test",
             },
             "bill_to": {
-                "name": "Audi de Quebec",
+                "name": "Northwind Auto",
                 "street": "999 Grande Allee",
                 "city": "Quebec",
                 "state": "QC",
@@ -293,7 +293,7 @@ class InvoiceApiTests(unittest.TestCase):
         with SessionLocal() as db:
             row = Job(
                 id=uuid4(),
-                job_code="SM2-2024-3001",
+                job_code="DIQ-2024-3001",
                 status="COMPLETED",
                 assigned_tech_id=technician.id,
                 dealership_id=dealership.id,
@@ -311,7 +311,7 @@ class InvoiceApiTests(unittest.TestCase):
 
             invalid_row = Job(
                 id=uuid4(),
-                job_code="SM2-2024-3002",
+                job_code="DIQ-2024-3002",
                 status="COMPLETED",
                 assigned_tech_id=technician.id,
                 dealership_id=None,
@@ -329,9 +329,9 @@ class InvoiceApiTests(unittest.TestCase):
         self.assertEqual(res.status_code, 200, res.text)
         payload = res.json()
         self.assertEqual(len(payload), 1)
-        self.assertEqual(payload[0]["job_code"], "SM2-2024-3001")
-        self.assertEqual(payload[0]["technician_name"], "Jolianne")
-        self.assertEqual(payload[0]["dealership_name"], "Audi de Quebec")
+        self.assertEqual(payload[0]["job_code"], "DIQ-2024-3001")
+        self.assertEqual(payload[0]["technician_name"], "Taylor Brooks")
+        self.assertEqual(payload[0]["dealership_name"], "Northwind Auto")
         self.assertEqual(payload[0]["estimated_subtotal"], "200.00")
         self.assertEqual(payload[0]["estimated_sales_tax"], "0.00")
         self.assertEqual(payload[0]["estimated_total"], "200.00")
@@ -346,7 +346,7 @@ class InvoiceApiTests(unittest.TestCase):
         with SessionLocal() as db:
             row = Job(
                 id=uuid4(),
-                job_code="SM2-2024-4001",
+                job_code="DIQ-2024-4001",
                 status="COMPLETED",
                 assigned_tech_id=technician.id,
                 dealership_id=dealership.id,
@@ -399,7 +399,7 @@ class InvoiceApiTests(unittest.TestCase):
         with SessionLocal() as db:
             row = Job(
                 id=uuid4(),
-                job_code="SM2-2024-4100",
+                job_code="DIQ-2024-4100",
                 status="COMPLETED",
                 assigned_tech_id=technician.id,
                 dealership_id=dealership.id,
@@ -476,7 +476,7 @@ class InvoiceApiTests(unittest.TestCase):
         with SessionLocal() as db:
             row = Job(
                 id=uuid4(),
-                job_code="SM2-2024-4200",
+                job_code="DIQ-2024-4200",
                 status="COMPLETED",
                 assigned_tech_id=technician.id,
                 dealership_id=None,
@@ -506,7 +506,7 @@ class InvoiceApiTests(unittest.TestCase):
         issues_res = self.client.get("/invoices/pending-approval-issues", headers=self.auth_header)
         self.assertEqual(issues_res.status_code, 200, issues_res.text)
         issues = issues_res.json()
-        issue = next((item for item in issues if item["job_code"] == "SM2-2024-4200"), None)
+        issue = next((item for item in issues if item["job_code"] == "DIQ-2024-4200"), None)
         self.assertIsNotNone(issue)
         self.assertTrue(any("address" in reason.lower() for reason in issue["blocking_reasons"]))
         self.assertTrue(any("missing price" in reason.lower() for reason in issue["blocking_reasons"]))
@@ -518,7 +518,7 @@ class InvoiceApiTests(unittest.TestCase):
         with SessionLocal() as db:
             valid_job = Job(
                 id=uuid4(),
-                job_code="SM2-2024-5001",
+                job_code="DIQ-2024-5001",
                 status="COMPLETED",
                 assigned_tech_id=technician.id,
                 dealership_id=dealership.id,
@@ -537,7 +537,7 @@ class InvoiceApiTests(unittest.TestCase):
 
             invalid_job = Job(
                 id=uuid4(),
-                job_code="SM2-2024-5002",
+                job_code="DIQ-2024-5002",
                 status="COMPLETED",
                 assigned_tech_id=technician.id,
                 dealership_id=None,
@@ -580,18 +580,18 @@ class InvoiceApiTests(unittest.TestCase):
         )
         self.assertEqual(get_default_res.status_code, 200, get_default_res.text)
         default_payload = get_default_res.json()
-        self.assertEqual(default_payload["name"], "SM2 Dispatch")
+        self.assertEqual(default_payload["name"], "DispatchIQ")
 
         update_payload = {
             "logo_url": "https://example.com/logo.png",
-            "name": "SM2 Dispatch QA",
+            "name": "DispatchIQ QA",
             "street_address": "500 Test Blvd",
             "city": "Quebec",
             "state": "QC",
             "zip_code": "G2A 1A1",
             "phone": "+1-418-555-9900",
-            "email": "billing.qa@sm2dispatch.com",
-            "website": "https://qa.sm2dispatch.com",
+            "email": "billing.qa@dispatchiq.test",
+            "website": "https://qa.dispatchiq.test",
         }
         put_res = self.client.put(
             "/admin/settings/invoice-branding",
@@ -616,7 +616,7 @@ class InvoiceApiTests(unittest.TestCase):
             json={
                 "terms": "NET_15",
                 "bill_to": {
-                    "name": "Audi de Quebec",
+                    "name": "Northwind Auto",
                     "street": "999 Grande Allee",
                     "city": "Quebec",
                     "state": "QC",
@@ -683,3 +683,4 @@ class InvoiceApiTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+

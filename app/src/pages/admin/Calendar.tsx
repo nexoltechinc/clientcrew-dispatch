@@ -82,7 +82,7 @@ import {
 
 import './calendar.css';
 
-const ADMIN_REFRESH_EVENT = 'sm-dispatch:admin-refresh';
+const ADMIN_REFRESH_EVENT = 'dispatchiq:admin-refresh';
 
 type CalendarViewMode = 'dayGridMonth' | 'timeGridWeek' | 'timeGridDay';
 type CalendarSourceKind = 'calendar' | 'job' | 'invoice';
@@ -1487,3 +1487,4 @@ export default function CalendarPage() {
     </div>
   );
 }
+

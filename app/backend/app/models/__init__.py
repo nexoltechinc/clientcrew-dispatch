@@ -1,6 +1,12 @@
 from .admin_credential_settings import AdminCredentialSettings
 from .audit_log import AuditLog
 from .calendar_event import CalendarEvent
+from .customer_conversation import (
+    CustomerConversation,
+    CustomerConversationMessage,
+    CustomerConversationNote,
+    CustomerIntakeRecord,
+)
 from .dealership import Dealership
 from .invoice import Invoice, InvoiceLineItem
 from .invoice_approval_draft import InvoiceApprovalDraft
@@ -10,6 +16,7 @@ from .job_event import JobEvent
 from .job_rejection import JobRejection
 from .job_service import JobService
 from .password_reset_token import PasswordResetToken
+from .notification import Notification
 from .priority_rule import PriorityRule
 from .service_catalog import ServiceCatalog
 from .skill import Skill, technician_skills

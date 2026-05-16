@@ -34,7 +34,7 @@ import {
 } from '@/lib/backend-api';
 
 type QuickRange = 'last_7_days' | 'last_30_days' | 'this_month';
-const ADMIN_REFRESH_EVENT = 'sm-dispatch:admin-refresh';
+const ADMIN_REFRESH_EVENT = 'dispatchiq:admin-refresh';
 
 const QUICK_RANGE_LABEL: Record<QuickRange, string> = {
   last_7_days: 'Last Week',
@@ -568,3 +568,4 @@ export default function ReportsPage() {
     </div>
   );
 }
+

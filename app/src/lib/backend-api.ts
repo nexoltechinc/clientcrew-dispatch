@@ -1,5 +1,5 @@
-const ADMIN_TOKEN_STORAGE_KEY = 'sm_dispatch_admin_access_token';
-const TECHNICIAN_TOKEN_STORAGE_KEY = 'sm_dispatch_technician_access_token';
+const ADMIN_TOKEN_STORAGE_KEY = 'dispatchiq_admin_access_token';
+const TECHNICIAN_TOKEN_STORAGE_KEY = 'dispatchiq_technician_access_token';
 const ENV_API_BASE_URL = (import.meta.env.VITE_BACKEND_URL || '').trim();
 const API_BASE_URL = (
   import.meta.env.DEV
@@ -193,6 +193,180 @@ export type BackendAdminJob = {
   requested_service_date?: string | null;
   requested_service_time?: string | null;
   source_system?: string | null;
+  source_metadata?: Record<string, unknown> | null;
+};
+
+export type BackendCustomerConversationSourceChannel =
+  | 'website_chatbot'
+  | 'customer_portal'
+  | 'booking_form'
+  | 'status_page';
+
+export type BackendCustomerConversationStatus =
+  | 'bot_active'
+  | 'waiting_for_agent'
+  | 'agent_joined'
+  | 'intake_created'
+  | 'converted_to_job'
+  | 'waiting_for_customer'
+  | 'closed'
+  | 'escalated'
+  | 'missed';
+
+export type BackendCustomerConversationUrgency = 'low' | 'normal' | 'high' | 'urgent';
+
+export type BackendCustomerConversationSenderType = 'bot' | 'customer' | 'admin' | 'system';
+
+export type BackendCustomerConversationSummary = {
+  total: number;
+  unread: number;
+  waiting_for_agent: number;
+  agent_joined: number;
+  intake_created: number;
+  converted_to_job: number;
+  waiting_for_customer: number;
+  escalated: number;
+  missed: number;
+  urgent: number;
+};
+
+export type BackendCustomerConversationServiceMatchCandidate = {
+  id: string;
+  code: string;
+  name: string;
+  category: string;
+  default_price: string | number;
+  approval_required: boolean;
+  status: string;
+};
+
+export type BackendCustomerConversationMessage = {
+  id: string;
+  conversation_id: string;
+  sender_type: BackendCustomerConversationSenderType;
+  sender_label?: string | null;
+  message_kind: string;
+  body: string;
+  attachment_url?: string | null;
+  attachment_name?: string | null;
+  attachment_mime_type?: string | null;
+  metadata?: Record<string, unknown> | null;
+  delivered_at?: string | null;
+  read_at?: string | null;
+  created_at: string;
+};
+
+export type BackendCustomerConversationNote = {
+  id: string;
+  conversation_id: string;
+  author_admin_id: string;
+  author_admin_label?: string | null;
+  note_body: string;
+  created_at: string;
+};
+
+export type BackendCustomerConversationCustomerProfile = {
+  dealership_id?: string | null;
+  dealership_name?: string | null;
+  dealership_status?: string | null;
+  customer_name?: string | null;
+  contact_person?: string | null;
+  phone?: string | null;
+  email?: string | null;
+  account_warning?: string | null;
+  matched_job_code?: string | null;
+  matched_intake_number?: string | null;
+};
+
+export type BackendCustomerConversationCollectedFields = {
+  requested_service_text?: string | null;
+  matched_service_id?: string | null;
+  matched_service_name?: string | null;
+  matched_service_candidates: BackendCustomerConversationServiceMatchCandidate[];
+  preferred_date?: string | null;
+  preferred_time?: string | null;
+  service_location_or_branch?: string | null;
+  vehicle_description?: string | null;
+  vehicle_unit_or_stock_number?: string | null;
+  urgency: BackendCustomerConversationUrgency;
+  special_notes?: string | null;
+};
+
+export type BackendCustomerConversationIntake = {
+  id: string;
+  intake_number: string;
+  source_system: 'customer_chatbot' | 'customer_portal' | 'booking_form' | 'status_page';
+  status: 'new' | 'reviewed' | 'converted' | 'closed';
+  conversation_id?: string | null;
+  dealership_id?: string | null;
+  customer_name?: string | null;
+  contact_person?: string | null;
+  phone?: string | null;
+  email?: string | null;
+  requested_service_text?: string | null;
+  matched_service_id?: string | null;
+  matched_service_name?: string | null;
+  vehicle_description?: string | null;
+  vehicle_unit_or_stock_number?: string | null;
+  preferred_date?: string | null;
+  preferred_time?: string | null;
+  location_branch?: string | null;
+  urgency: BackendCustomerConversationUrgency;
+  notes?: string | null;
+  linked_job_id?: string | null;
+  created_by_admin_id?: string | null;
+  created_by_admin_label?: string | null;
+  updated_by_admin_id?: string | null;
+  updated_by_admin_label?: string | null;
+  created_at: string;
+  updated_at: string;
+};
+
+export type BackendCustomerConversationJobLink = {
+  job_id: string;
+  job_code: string;
+  status: string;
+  dealership_id?: string | null;
+  dealership_name?: string | null;
+  service_type?: string | null;
+  vehicle?: string | null;
+  requested_service_date?: string | null;
+  requested_service_time?: string | null;
+};
+
+export type BackendCustomerConversationListItem = {
+  id: string;
+  reference_number: string;
+  source_channel: BackendCustomerConversationSourceChannel;
+  status: BackendCustomerConversationStatus;
+  urgency: BackendCustomerConversationUrgency;
+  customer_name?: string | null;
+  contact_person?: string | null;
+  phone?: string | null;
+  email?: string | null;
+  requested_service?: string | null;
+  matched_service_name?: string | null;
+  last_message_preview?: string | null;
+  assigned_admin_label?: string | null;
+  created_at: string;
+  last_activity_at: string;
+  unread_count: number;
+  dealership_name?: string | null;
+  dealership_status?: string | null;
+  linked_job_code?: string | null;
+  linked_intake_number?: string | null;
+  is_inactive_account_warning: boolean;
+  is_service_match_ambiguous: boolean;
+};
+
+export type BackendCustomerConversationDetail = BackendCustomerConversationListItem & {
+  customer_profile: BackendCustomerConversationCustomerProfile;
+  collected_fields: BackendCustomerConversationCollectedFields;
+  messages: BackendCustomerConversationMessage[];
+  internal_notes: BackendCustomerConversationNote[];
+  linked_intake?: BackendCustomerConversationIntake | null;
+  linked_job?: BackendCustomerConversationJobLink | null;
+  allowed_actions: string[];
   source_metadata?: Record<string, unknown> | null;
 };
 
@@ -849,6 +1023,249 @@ export async function fetchAdminDealerships(token: string): Promise<BackendDeale
   return requestJson<BackendDealership[]>('/admin/dealerships', { token });
 }
 
+export async function fetchAdminCustomerConversationSummary(
+  token: string,
+): Promise<BackendCustomerConversationSummary> {
+  return requestJson<BackendCustomerConversationSummary>('/admin/customer-conversations/summary', { token });
+}
+
+export async function fetchAdminCustomerConversations(
+  token: string,
+  params?: {
+    status?: string;
+    assigned_agent?: string;
+    urgency?: string;
+    service_type?: string;
+    source_channel?: string;
+    date_from?: string;
+    date_to?: string;
+    unread_only?: boolean;
+    search?: string;
+  },
+): Promise<BackendCustomerConversationListItem[]> {
+  const search = new URLSearchParams();
+  if (params?.status) search.set('status', params.status);
+  if (params?.assigned_agent) search.set('assigned_agent', params.assigned_agent);
+  if (params?.urgency) search.set('urgency', params.urgency);
+  if (params?.service_type) search.set('service_type', params.service_type);
+  if (params?.source_channel) search.set('source_channel', params.source_channel);
+  if (params?.date_from) search.set('date_from', params.date_from);
+  if (params?.date_to) search.set('date_to', params.date_to);
+  if (params?.unread_only) search.set('unread_only', 'true');
+  if (params?.search) search.set('search', params.search);
+  const suffix = search.toString() ? `?${search.toString()}` : '';
+  return requestJson<BackendCustomerConversationListItem[]>(`/admin/customer-conversations${suffix}`, { token });
+}
+
+export async function fetchAdminCustomerConversation(
+  token: string,
+  conversationId: string,
+): Promise<BackendCustomerConversationDetail> {
+  return requestJson<BackendCustomerConversationDetail>(`/admin/customer-conversations/${conversationId}`, { token });
+}
+
+export async function fetchAdminCustomerConversationMessages(
+  token: string,
+  conversationId: string,
+): Promise<BackendCustomerConversationMessage[]> {
+  return requestJson<BackendCustomerConversationMessage[]>(
+    `/admin/customer-conversations/${conversationId}/messages`,
+    { token },
+  );
+}
+
+export async function replyAdminCustomerConversation(
+  token: string,
+  conversationId: string,
+  payload: {
+    message: string;
+    attachment_url?: string | null;
+    attachment_name?: string | null;
+    attachment_mime_type?: string | null;
+  },
+): Promise<BackendCustomerConversationDetail> {
+  return requestJson<BackendCustomerConversationDetail>(`/admin/customer-conversations/${conversationId}/messages`, {
+    method: 'POST',
+    token,
+    body: payload,
+  });
+}
+
+export async function joinAdminCustomerConversation(
+  token: string,
+  conversationId: string,
+): Promise<BackendCustomerConversationDetail> {
+  return requestJson<BackendCustomerConversationDetail>(`/admin/customer-conversations/${conversationId}/join`, {
+    method: 'POST',
+    token,
+  });
+}
+
+export async function assignAdminCustomerConversation(
+  token: string,
+  conversationId: string,
+  payload: {
+    assigned_agent_label?: string | null;
+    assign_to_me?: boolean;
+    clear_assignment?: boolean;
+  },
+): Promise<BackendCustomerConversationDetail> {
+  return requestJson<BackendCustomerConversationDetail>(`/admin/customer-conversations/${conversationId}/assignment`, {
+    method: 'PATCH',
+    token,
+    body: payload,
+  });
+}
+
+export async function updateAdminCustomerConversationStatus(
+  token: string,
+  conversationId: string,
+  payload: {
+    status: BackendCustomerConversationStatus;
+    reason?: string | null;
+  },
+): Promise<BackendCustomerConversationDetail> {
+  return requestJson<BackendCustomerConversationDetail>(`/admin/customer-conversations/${conversationId}/status`, {
+    method: 'PATCH',
+    token,
+    body: payload,
+  });
+}
+
+export async function markAdminCustomerConversationRead(
+  token: string,
+  conversationId: string,
+): Promise<BackendCustomerConversationDetail> {
+  return requestJson<BackendCustomerConversationDetail>(`/admin/customer-conversations/${conversationId}/read`, {
+    method: 'POST',
+    token,
+  });
+}
+
+export async function addAdminCustomerConversationNote(
+  token: string,
+  conversationId: string,
+  note_body: string,
+): Promise<BackendCustomerConversationDetail> {
+  return requestJson<BackendCustomerConversationDetail>(`/admin/customer-conversations/${conversationId}/internal-notes`, {
+    method: 'POST',
+    token,
+    body: { note_body },
+  });
+}
+
+export async function markAdminCustomerConversationUrgent(
+  token: string,
+  conversationId: string,
+): Promise<BackendCustomerConversationDetail> {
+  return requestJson<BackendCustomerConversationDetail>(`/admin/customer-conversations/${conversationId}/mark-urgent`, {
+    method: 'POST',
+    token,
+  });
+}
+
+export async function closeAdminCustomerConversation(
+  token: string,
+  conversationId: string,
+  reason?: string | null,
+): Promise<BackendCustomerConversationDetail> {
+  const search = new URLSearchParams();
+  if (reason) search.set('reason', reason);
+  const suffix = search.toString() ? `?${search.toString()}` : '';
+  return requestJson<BackendCustomerConversationDetail>(`/admin/customer-conversations/${conversationId}/close${suffix}`, {
+    method: 'POST',
+    token,
+  });
+}
+
+export async function escalateAdminCustomerConversation(
+  token: string,
+  conversationId: string,
+  reason?: string | null,
+): Promise<BackendCustomerConversationDetail> {
+  const search = new URLSearchParams();
+  if (reason) search.set('reason', reason);
+  const suffix = search.toString() ? `?${search.toString()}` : '';
+  return requestJson<BackendCustomerConversationDetail>(`/admin/customer-conversations/${conversationId}/escalate${suffix}`, {
+    method: 'POST',
+    token,
+  });
+}
+
+export async function createAdminCustomerConversationIntake(
+  token: string,
+  conversationId: string,
+  payload: {
+    status?: 'new' | 'reviewed' | 'converted' | 'closed';
+    customer_name?: string | null;
+    contact_person?: string | null;
+    phone?: string | null;
+    email?: string | null;
+    requested_service_text?: string | null;
+    matched_service_id?: string | null;
+    matched_service_name?: string | null;
+    vehicle_description?: string | null;
+    vehicle_unit_or_stock_number?: string | null;
+    preferred_date?: string | null;
+    preferred_time?: string | null;
+    location_branch?: string | null;
+    urgency?: BackendCustomerConversationUrgency;
+    notes?: string | null;
+  },
+): Promise<BackendCustomerConversationIntake> {
+  return requestJson<BackendCustomerConversationIntake>(`/admin/customer-conversations/${conversationId}/intake`, {
+    method: 'POST',
+    token,
+    body: payload,
+  });
+}
+
+export async function linkAdminCustomerConversationIntake(
+  token: string,
+  conversationId: string,
+  payload: { intake_id?: string | null; intake_number?: string | null },
+): Promise<BackendCustomerConversationDetail> {
+  return requestJson<BackendCustomerConversationDetail>(`/admin/customer-conversations/${conversationId}/link-intake`, {
+    method: 'POST',
+    token,
+    body: payload,
+  });
+}
+
+export async function linkAdminCustomerConversationJob(
+  token: string,
+  conversationId: string,
+  payload: { job_id?: string | null; job_code?: string | null },
+): Promise<BackendCustomerConversationDetail> {
+  return requestJson<BackendCustomerConversationDetail>(`/admin/customer-conversations/${conversationId}/link-job`, {
+    method: 'POST',
+    token,
+    body: payload,
+  });
+}
+
+export async function convertAdminCustomerConversationToJob(
+  token: string,
+  conversationId: string,
+  payload: {
+    dealership_name?: string | null;
+    service_name?: string | null;
+    service_names?: string[];
+    vehicle_summary?: string | null;
+    requested_service_date?: string | null;
+    requested_service_time?: string | null;
+    pre_assigned_technician_id?: string | null;
+    notes?: string | null;
+    create_intake_first?: boolean;
+  },
+): Promise<BackendCustomerConversationDetail> {
+  return requestJson<BackendCustomerConversationDetail>(`/admin/customer-conversations/${conversationId}/convert-to-job`, {
+    method: 'POST',
+    token,
+    body: payload,
+  });
+}
+
 export async function fetchAdminServices(
   token: string,
   includeArchived = true,
@@ -1456,3 +1873,4 @@ export async function fetchAdminReportsOverview(
   const suffix = search.toString() ? `?${search.toString()}` : '';
   return requestJson<BackendReportsOverview>(`/admin/reports/overview${suffix}`, { token });
 }
+

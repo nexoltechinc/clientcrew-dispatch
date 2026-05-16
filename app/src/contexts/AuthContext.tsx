@@ -96,9 +96,9 @@ interface AuthContextType {
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
-const AUTH_STORAGE_KEY = 'sm_dispatch_auth_user';
-const TECHNICIANS_STORAGE_KEY = 'sm_dispatch_technician_accounts';
-const TECHNICIAN_SIGNUP_REQUESTS_STORAGE_KEY = 'sm_dispatch_technician_signup_requests';
+const AUTH_STORAGE_KEY = 'dispatchiq_auth_user';
+const TECHNICIANS_STORAGE_KEY = 'dispatchiq_technician_accounts';
+const TECHNICIAN_SIGNUP_REQUESTS_STORAGE_KEY = 'dispatchiq_technician_signup_requests';
 const ADMIN_EMAIL = currentUser.email.toLowerCase();
 
 const DEFAULT_TECHNICIAN_ACCOUNTS: TechnicianAccount[] = [
@@ -338,14 +338,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     if (typeof window === 'undefined') {
       return false;
     }
-    const token = window.localStorage.getItem('sm_dispatch_admin_access_token');
+    const token = window.localStorage.getItem('dispatchiq_admin_access_token');
     return Boolean(token && token.trim());
   });
   const [hasBackendTechnicianToken, setHasBackendTechnicianToken] = useState<boolean>(() => {
     if (typeof window === 'undefined') {
       return false;
     }
-    const token = window.localStorage.getItem('sm_dispatch_technician_access_token');
+    const token = window.localStorage.getItem('dispatchiq_technician_access_token');
     return Boolean(token && token.trim());
   });
 
@@ -791,3 +791,4 @@ export function useAuth() {
   }
   return context;
 }
+

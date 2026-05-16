@@ -27,7 +27,7 @@ router = APIRouter(prefix="/admin/jobs", tags=["admin-jobs"])
 
 def _generate_manual_job_code(db: Session) -> str:
     for _ in range(10):
-        candidate = f"SM2-NEW-{uuid4().hex[:6].upper()}"
+        candidate = f"DIQ-NEW-{uuid4().hex[:6].upper()}"
         existing = db.query(Job.id).filter(Job.job_code == candidate).first()
         if existing is None:
             return candidate
@@ -346,3 +346,4 @@ def sync_admin_job_location_from_dealership(
         db.refresh(job_row)
 
     return _serialize_admin_job_row(db, job_row)
+

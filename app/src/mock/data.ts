@@ -1,4 +1,4 @@
-// SM2 Dispatch - Mock Data
+// DispatchIQ - Mock Data
 
 import type {
   User,
@@ -30,8 +30,8 @@ export const currentUser: User = {
 // Technician User
 export const technicianUser: User = {
   id: 'user-2',
-  email: 'tech@mikechen.com',
-  name: 'Mike Chen',
+  email: 'tech@dispatchiq.test',
+  name: 'Alex Morgan',
   role: 'technician',
   avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Mike',
   phone: '+1 (555) 234-5678',
@@ -87,7 +87,7 @@ export const dealerships: Dealership[] = [
   },
   {
     "id": "D-005",
-    "name": "audi de quebec",
+    "name": "northwind auto",
     "phone": "581-705-8089",
     "email": "comptabilite@audidequebec.com, jvilleneuve@audidequebec.com",
     "address": "5200 rue john molson",
@@ -131,7 +131,7 @@ export const dealerships: Dealership[] = [
   },
   {
     "id": "D-009",
-    "name": "germain nissan donnacona",
+    "name": "summit motors",
     "phone": "(418) 285-0970",
     "email": "dthibault@germainnissan.ca",
     "address": "104 rue commerciale",
@@ -142,7 +142,7 @@ export const dealerships: Dealership[] = [
   },
   {
     "id": "D-010",
-    "name": "Donnacona Chrysler Jeep Dodge Ram",
+    "name": "Atlas Auto Group",
     "phone": "",
     "email": "",
     "address": "160 Rue Commerciale",
@@ -153,7 +153,7 @@ export const dealerships: Dealership[] = [
   },
   {
     "id": "D-011",
-    "name": "Donnacona Ford",
+    "name": "Summit Ford",
     "phone": "",
     "email": "",
     "address": "128 Bd Les Écureuils",
@@ -186,7 +186,7 @@ export const dealerships: Dealership[] = [
   },
   {
     "id": "D-014",
-    "name": "Germain Nissan Donnacona",
+    "name": "Summit Motors",
     "phone": "",
     "email": "",
     "address": "104 Rue Commerciale",
@@ -197,7 +197,7 @@ export const dealerships: Dealership[] = [
   },
   {
     "id": "D-015",
-    "name": "Honda Donnacona",
+    "name": "Pioneer Honda",
     "phone": "",
     "email": "",
     "address": "159 Rue Commerciale",
@@ -406,7 +406,7 @@ export const dealerships: Dealership[] = [
   },
   {
     "id": "D-034",
-    "name": "St-Raymond Toyota",
+    "name": "Harbor Toyota",
     "phone": "",
     "email": "",
     "address": "565 Côte Joyeuse",
@@ -530,10 +530,10 @@ export const technicians: Technician[] = [
   {
     id: 'tech-1',
     userId: 'user-2',
-    name: 'Mike Chen',
+    name: 'Alex Morgan',
     techCode: 'MC001',
     phone: '+1 (555) 234-5678',
-    email: 'tech@mikechen.com',
+    email: 'tech@dispatchiq.test',
     status: 'ACTIVE',
     skills: ['OIL', 'TIRE', 'BRAKE', 'DIAG'],
     zones: ['Downtown', 'Northside'],
@@ -1014,7 +1014,7 @@ export const auditEvents: AuditEvent[] = [
     actorType: 'ADMIN',
     actorId: 'user-1',
     actorName: 'Alex Morgan',
-    summary: 'Technician Mike Chen assigned to job',
+    summary: 'Technician Alex Morgan assigned to job',
     createdAt: '2024-12-01T08:15:00Z',
   },
   {
@@ -1024,7 +1024,7 @@ export const auditEvents: AuditEvent[] = [
     eventType: 'TECH_ACCEPTED',
     actorType: 'TECHNICIAN',
     actorId: 'tech-1',
-    actorName: 'Mike Chen',
+    actorName: 'Alex Morgan',
     summary: 'Technician accepted the job',
     createdAt: '2024-12-01T08:20:00Z',
   },
@@ -1035,7 +1035,7 @@ export const auditEvents: AuditEvent[] = [
     eventType: 'STATUS_CHANGED',
     actorType: 'TECHNICIAN',
     actorId: 'tech-1',
-    actorName: 'Mike Chen',
+    actorName: 'Alex Morgan',
     summary: 'Status changed to IN_PROGRESS',
     payload: { from: 'DISPATCHING', to: 'IN_PROGRESS' },
     createdAt: '2024-12-01T10:00:00Z',
@@ -1047,7 +1047,7 @@ export const auditEvents: AuditEvent[] = [
     eventType: 'STATUS_CHANGED',
     actorType: 'TECHNICIAN',
     actorId: 'tech-1',
-    actorName: 'Mike Chen',
+    actorName: 'Alex Morgan',
     summary: 'Status changed to COMPLETED',
     payload: { from: 'IN_PROGRESS', to: 'COMPLETED' },
     createdAt: '2024-12-01T14:30:00Z',
@@ -1296,7 +1296,7 @@ export const weeklyReport: WeeklyReport = {
   technicianPerformance: [
     {
       technicianId: 'tech-1',
-      technicianName: 'Mike Chen',
+      technicianName: 'Alex Morgan',
       jobsCompleted: 28,
       averageJobTime: 3.8,
       totalRevenue: 4250.5,
@@ -1358,12 +1358,12 @@ export const getServiceById = (id: string) => services.find(s => s.id === id);
 export const priorityRules: PriorityRule[] = [
   {
     id: "rule-1",
-    dealershipId: "D-005", // audi de quebec
+    dealershipId: "D-005", // northwind auto
     targetUrgency: "HIGH",
     rankingScore: 10,
 
     isActive: true,
-    description: "Always prioritize Audi de Quebec jobs",
+    description: "Always prioritize Northwind Auto jobs",
     createdAt: "2024-01-01T00:00:00Z",
     updatedAt: "2024-01-01T00:00:00Z",
   },
@@ -1392,3 +1392,4 @@ export const priorityRules: PriorityRule[] = [
     updatedAt: "2024-01-01T00:00:00Z",
   }
 ];
+

@@ -72,7 +72,7 @@ interface AuditEvent {
     request_id?: string;
 }
 
-const AUDIT_LOGS_STORAGE_KEY = 'sm_dispatch_audit_logs';
+const AUDIT_LOGS_STORAGE_KEY = 'dispatchiq_audit_logs';
 const AUDIT_LOG_EXPORT_COLUMNS = [
     'Timestamp',
     'EventType',
@@ -132,8 +132,8 @@ const MOCK_LOGS: AuditEvent[] = [
         event_type: 'dealership.added',
         actor_type: 'ADMIN_USER',
         actor_name: 'Manager Bob',
-        summary: 'New customer "Toyota Ste-Foy" added',
-        payload_json: { dealership_id: 'D-099', name: 'Toyota Ste-Foy', phone: '+14185550199' },
+        summary: 'New customer "Lakeside Toyota" added',
+        payload_json: { dealership_id: 'D-099', name: 'Lakeside Toyota', phone: '+14185550199' },
         severity: 'info',
         correlation_id: 'corr_jkl012'
     },
@@ -567,3 +567,4 @@ export default function AuditLogsPage() {
         </div>
     );
 }
+
